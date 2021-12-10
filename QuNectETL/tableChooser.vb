@@ -20,9 +20,7 @@
             Exit Sub
         End If
         Dim tableLabel As Label
-        If frmCopy.sourceOrDestination = frmCopy.tableType.source Then
-            tableLabel = frmCopy.lblSourceTable
-        ElseIf frmCopy.sourceOrDestination = frmCopy.tableType.sourceCatalog Then
+        If frmCopy.sourceOrDestination = frmCopy.tableType.sourceCatalog Then
             frmCopy.lblCatalog.Tag = tvAppsTables.SelectedNode.Tag
             frmCopy.lblCatalog.Text = tvAppsTables.SelectedNode.FullPath()
             hideButtons()

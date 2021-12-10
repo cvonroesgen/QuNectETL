@@ -29,7 +29,6 @@ Partial Class frmCopy
         Me.dgMapping = New System.Windows.Forms.DataGridView()
         Me.Source = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Destination = New System.Windows.Forms.DataGridViewComboBoxColumn()
-        Me.btnSource = New System.Windows.Forms.Button()
         Me.btnImport = New System.Windows.Forms.Button()
         Me.btnDestination = New System.Windows.Forms.Button()
         Me.pb = New System.Windows.Forms.ProgressBar()
@@ -41,15 +40,16 @@ Partial Class frmCopy
         Me.lblUsername = New System.Windows.Forms.Label()
         Me.txtUsername = New System.Windows.Forms.TextBox()
         Me.lblDestinationTable = New System.Windows.Forms.Label()
-        Me.lblSourceTable = New System.Windows.Forms.Label()
         Me.ckbDetectProxy = New System.Windows.Forms.CheckBox()
         Me.btnListFields = New System.Windows.Forms.Button()
         Me.lblProgress = New System.Windows.Forms.Label()
-        Me.btnCatalog = New System.Windows.Forms.Button()
         Me.lblCatalog = New System.Windows.Forms.Label()
         Me.cmbPassword = New System.Windows.Forms.ComboBox()
         Me.btnAppToken = New System.Windows.Forms.Button()
         Me.btnUserToken = New System.Windows.Forms.Button()
+        Me.btnSQLStatement = New System.Windows.Forms.Button()
+        Me.lblDSN = New System.Windows.Forms.Label()
+        Me.cmbDSN = New System.Windows.Forms.ComboBox()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -75,7 +75,7 @@ Partial Class frmCopy
         DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
         DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.dgMapping.DefaultCellStyle = DataGridViewCellStyle2
-        Me.dgMapping.Location = New System.Drawing.Point(18, 241)
+        Me.dgMapping.Location = New System.Drawing.Point(12, 251)
         Me.dgMapping.Name = "dgMapping"
         DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control
@@ -85,7 +85,7 @@ Partial Class frmCopy
         DataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
         Me.dgMapping.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
-        Me.dgMapping.Size = New System.Drawing.Size(516, 682)
+        Me.dgMapping.Size = New System.Drawing.Size(522, 716)
         Me.dgMapping.TabIndex = 0
         '
         'Source
@@ -101,18 +101,9 @@ Partial Class frmCopy
         Me.Destination.Name = "Destination"
         Me.Destination.Width = 200
         '
-        'btnSource
-        '
-        Me.btnSource.Location = New System.Drawing.Point(11, 145)
-        Me.btnSource.Name = "btnSource"
-        Me.btnSource.Size = New System.Drawing.Size(168, 27)
-        Me.btnSource.TabIndex = 1
-        Me.btnSource.Text = "Choose Source Table..."
-        Me.btnSource.UseVisualStyleBackColor = True
-        '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(349, 208)
+        Me.btnImport.Location = New System.Drawing.Point(349, 212)
         Me.btnImport.Name = "btnImport"
         Me.btnImport.Size = New System.Drawing.Size(185, 27)
         Me.btnImport.TabIndex = 3
@@ -121,7 +112,7 @@ Partial Class frmCopy
         '
         'btnDestination
         '
-        Me.btnDestination.Location = New System.Drawing.Point(12, 178)
+        Me.btnDestination.Location = New System.Drawing.Point(12, 188)
         Me.btnDestination.Name = "btnDestination"
         Me.btnDestination.Size = New System.Drawing.Size(167, 23)
         Me.btnDestination.TabIndex = 4
@@ -195,18 +186,10 @@ Partial Class frmCopy
         'lblDestinationTable
         '
         Me.lblDestinationTable.AutoSize = True
-        Me.lblDestinationTable.Location = New System.Drawing.Point(184, 183)
+        Me.lblDestinationTable.Location = New System.Drawing.Point(184, 193)
         Me.lblDestinationTable.Name = "lblDestinationTable"
         Me.lblDestinationTable.Size = New System.Drawing.Size(0, 13)
         Me.lblDestinationTable.TabIndex = 34
-        '
-        'lblSourceTable
-        '
-        Me.lblSourceTable.AutoSize = True
-        Me.lblSourceTable.Location = New System.Drawing.Point(185, 154)
-        Me.lblSourceTable.Name = "lblSourceTable"
-        Me.lblSourceTable.Size = New System.Drawing.Size(0, 13)
-        Me.lblSourceTable.TabIndex = 35
         '
         'ckbDetectProxy
         '
@@ -220,7 +203,7 @@ Partial Class frmCopy
         '
         'btnListFields
         '
-        Me.btnListFields.Location = New System.Drawing.Point(12, 208)
+        Me.btnListFields.Location = New System.Drawing.Point(12, 218)
         Me.btnListFields.Name = "btnListFields"
         Me.btnListFields.Size = New System.Drawing.Size(82, 27)
         Me.btnListFields.TabIndex = 37
@@ -230,24 +213,15 @@ Partial Class frmCopy
         'lblProgress
         '
         Me.lblProgress.AutoSize = True
-        Me.lblProgress.Location = New System.Drawing.Point(116, 215)
+        Me.lblProgress.Location = New System.Drawing.Point(116, 225)
         Me.lblProgress.Name = "lblProgress"
         Me.lblProgress.Size = New System.Drawing.Size(0, 13)
         Me.lblProgress.TabIndex = 42
         '
-        'btnCatalog
-        '
-        Me.btnCatalog.Location = New System.Drawing.Point(12, 112)
-        Me.btnCatalog.Name = "btnCatalog"
-        Me.btnCatalog.Size = New System.Drawing.Size(167, 27)
-        Me.btnCatalog.TabIndex = 44
-        Me.btnCatalog.Text = "Choose Source Application..."
-        Me.btnCatalog.UseVisualStyleBackColor = True
-        '
         'lblCatalog
         '
         Me.lblCatalog.AutoSize = True
-        Me.lblCatalog.Location = New System.Drawing.Point(185, 119)
+        Me.lblCatalog.Location = New System.Drawing.Point(185, 125)
         Me.lblCatalog.Name = "lblCatalog"
         Me.lblCatalog.Size = New System.Drawing.Size(0, 13)
         Me.lblCatalog.TabIndex = 45
@@ -280,20 +254,47 @@ Partial Class frmCopy
         Me.btnUserToken.Text = "?"
         Me.btnUserToken.UseVisualStyleBackColor = True
         '
+        'btnSQLStatement
+        '
+        Me.btnSQLStatement.Location = New System.Drawing.Point(12, 152)
+        Me.btnSQLStatement.Name = "btnSQLStatement"
+        Me.btnSQLStatement.Size = New System.Drawing.Size(167, 28)
+        Me.btnSQLStatement.TabIndex = 81
+        Me.btnSQLStatement.Text = "Enter Source SQL Statement"
+        Me.btnSQLStatement.UseVisualStyleBackColor = True
+        '
+        'lblDSN
+        '
+        Me.lblDSN.AutoSize = True
+        Me.lblDSN.Location = New System.Drawing.Point(15, 107)
+        Me.lblDSN.Name = "lblDSN"
+        Me.lblDSN.Size = New System.Drawing.Size(30, 13)
+        Me.lblDSN.TabIndex = 83
+        Me.lblDSN.Text = "DSN"
+        '
+        'cmbDSN
+        '
+        Me.cmbDSN.FormattingEnabled = True
+        Me.cmbDSN.Location = New System.Drawing.Point(12, 125)
+        Me.cmbDSN.Name = "cmbDSN"
+        Me.cmbDSN.Size = New System.Drawing.Size(522, 21)
+        Me.cmbDSN.TabIndex = 82
+        '
         'frmCopy
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(543, 947)
+        Me.ClientSize = New System.Drawing.Size(565, 998)
+        Me.Controls.Add(Me.lblDSN)
+        Me.Controls.Add(Me.cmbDSN)
+        Me.Controls.Add(Me.btnSQLStatement)
         Me.Controls.Add(Me.btnUserToken)
         Me.Controls.Add(Me.btnAppToken)
         Me.Controls.Add(Me.cmbPassword)
         Me.Controls.Add(Me.lblCatalog)
-        Me.Controls.Add(Me.btnCatalog)
         Me.Controls.Add(Me.lblProgress)
         Me.Controls.Add(Me.btnListFields)
         Me.Controls.Add(Me.ckbDetectProxy)
-        Me.Controls.Add(Me.lblSourceTable)
         Me.Controls.Add(Me.lblDestinationTable)
         Me.Controls.Add(Me.pb)
         Me.Controls.Add(Me.lblAppToken)
@@ -305,7 +306,6 @@ Partial Class frmCopy
         Me.Controls.Add(Me.txtUsername)
         Me.Controls.Add(Me.btnDestination)
         Me.Controls.Add(Me.btnImport)
-        Me.Controls.Add(Me.btnSource)
         Me.Controls.Add(Me.dgMapping)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmCopy"
@@ -316,7 +316,6 @@ Partial Class frmCopy
 
     End Sub
     Friend WithEvents dgMapping As System.Windows.Forms.DataGridView
-    Friend WithEvents btnSource As System.Windows.Forms.Button
     Friend WithEvents btnImport As System.Windows.Forms.Button
     Friend WithEvents btnDestination As System.Windows.Forms.Button
     Friend WithEvents pb As System.Windows.Forms.ProgressBar
@@ -328,15 +327,16 @@ Partial Class frmCopy
     Friend WithEvents lblUsername As System.Windows.Forms.Label
     Friend WithEvents txtUsername As System.Windows.Forms.TextBox
     Friend WithEvents lblDestinationTable As System.Windows.Forms.Label
-    Friend WithEvents lblSourceTable As System.Windows.Forms.Label
     Friend WithEvents ckbDetectProxy As System.Windows.Forms.CheckBox
     Friend WithEvents btnListFields As System.Windows.Forms.Button
     Friend WithEvents Source As DataGridViewTextBoxColumn
     Friend WithEvents Destination As DataGridViewComboBoxColumn
     Friend WithEvents lblProgress As Label
-    Friend WithEvents btnCatalog As Button
     Friend WithEvents lblCatalog As Label
     Friend WithEvents cmbPassword As ComboBox
     Friend WithEvents btnAppToken As Button
     Friend WithEvents btnUserToken As Button
+    Friend WithEvents btnSQLStatement As Button
+    Friend WithEvents lblDSN As Label
+    Friend WithEvents cmbDSN As ComboBox
 End Class
