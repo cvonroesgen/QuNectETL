@@ -2,18 +2,7 @@
 Imports System.Data.Odbc
 Imports System.Text.RegularExpressions
 
-Public Class frmCopy
-    Public Structure fieldStruct
-        Public fid As String
-        Public label As String
-        Public type As String
-        Public parentFieldID As String
-        Public unique As Boolean
-        Public required As Boolean
-        Public base_type As String
-        Public decimal_places As Integer
-    End Structure
-
+Public Class frmETL
     Private Structure connectionStrings
         Public src As String
         Public dst As String
@@ -96,6 +85,7 @@ Public Class frmCopy
         txtServer.Text = GetSetting(AppName, "Credentials", "server", "")
         txtAppToken.Text = GetSetting(AppName, "Credentials", "apptoken", "b2fr52jcykx3tnbwj8s74b8ed55b")
         lblDestinationTable.Text = GetSetting(AppName, "config", "destinationtable", "")
+        strSourceSQL = GetSetting(AppName, "config", "SQL", "")
         Dim dsn As String = GetSetting(AppName, "Connection", "DSN", "")
         GetDSNs()
         cmbDSN.SelectedIndex = cmbDSN.FindStringExact(dsn)
@@ -106,6 +96,7 @@ Public Class frmCopy
         Else
             ckbDetectProxy.Checked = False
         End If
+        lblSQL.Text = strSourceSQL
         showHideControls()
     End Sub
 
@@ -164,12 +155,12 @@ Public Class frmCopy
     Private Sub txtUsername_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtUsername.TextChanged
         SaveSetting(AppName, "Credentials", "username", txtUsername.Text)
         showHideControls()
-        showHideControls()
+
     End Sub
 
     Private Sub txtPassword_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPassword.TextChanged
         SaveSetting(AppName, "Credentials", "password", txtPassword.Text)
-        showHideControls()
+
         showHideControls()
     End Sub
 
@@ -696,7 +687,8 @@ Public Class frmCopy
     End Sub
 
 
-    Private Sub frmCopy_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+    Private Sub frmETL_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        SaveSetting(AppName, "config", "SQL", strSourceSQL)
         VolatileWrite(copyFinished, True)
     End Sub
 
@@ -757,9 +749,6 @@ Public Class frmCopy
         Me.Cursor = Cursors.Default
     End Sub
 
-    Private Sub btnImport_ClientSizeChanged(sender As Object, e As EventArgs) Handles btnImport.ClientSizeChanged
-
-    End Sub
 End Class
 
 

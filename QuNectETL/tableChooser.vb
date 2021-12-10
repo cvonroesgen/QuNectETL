@@ -10,7 +10,7 @@
         If tvAppsTables.SelectedNode.Level <> 1 Then
             Exit Sub
         End If
-        frmCopy.lblDestinationTable.Text = tvAppsTables.SelectedNode.FullPath()
+        frmETL.lblDestinationTable.Text = tvAppsTables.SelectedNode.FullPath()
         hideButtons()
     End Sub
 
@@ -20,17 +20,17 @@
             Exit Sub
         End If
         Dim tableLabel As Label
-        If frmCopy.sourceOrDestination = frmCopy.tableType.sourceCatalog Then
-            frmCopy.lblCatalog.Tag = tvAppsTables.SelectedNode.Tag
-            frmCopy.lblCatalog.Text = tvAppsTables.SelectedNode.FullPath()
+        If frmETL.sourceOrDestination = frmETL.tableType.sourceCatalog Then
+            frmETL.lblCatalog.Tag = tvAppsTables.SelectedNode.Tag
+            frmETL.lblCatalog.Text = tvAppsTables.SelectedNode.FullPath()
             hideButtons()
             Me.Hide()
             Return
         Else
-            tableLabel = frmCopy.lblDestinationTable
+            tableLabel = frmETL.lblDestinationTable
         End If
 
-        If tvAppsTables.SelectedNode.Level <> 1 And frmCopy.sourceOrDestination <> frmCopy.tableType.source Then
+        If tvAppsTables.SelectedNode.Level <> 1 And frmETL.sourceOrDestination <> frmETL.tableType.source Then
             tableLabel.Text = ""
         Else
             tableLabel.Text = tvAppsTables.SelectedNode.FullPath()
@@ -39,7 +39,7 @@
         Me.Hide()
     End Sub
     Private Sub hideButtons()
-        frmCopy.btnImport.Visible = False
-        frmCopy.dgMapping.Visible = False
+        frmETL.btnImport.Visible = False
+        frmETL.dgMapping.Visible = False
     End Sub
 End Class

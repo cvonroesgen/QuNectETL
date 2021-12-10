@@ -157,11 +157,11 @@
     <Compile Include="preview.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="copy.vb">
+    <Compile Include="frmETL.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="copy.Designer.vb">
-      <DependentUpon>copy.vb</DependentUpon>
+    <Compile Include="frmETL.Designer.vb">
+      <DependentUpon>frmETL.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -203,8 +203,8 @@
     <EmbeddedResource Include="preview.resx">
       <DependentUpon>preview.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="copy.resx">
-      <DependentUpon>copy.vb</DependentUpon>
+    <EmbeddedResource Include="frmETL.resx">
+      <DependentUpon>frmETL.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="tableChooser.resx">
