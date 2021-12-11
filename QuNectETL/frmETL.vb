@@ -58,6 +58,8 @@ Public Class frmETL
     Private cmdLineArgs() As String
     Private automode As Boolean = True
     Private Const AppName = "QuNectETL"
+    Private Const fieldDelimter = "|fid"
+    Private Const fieldTypeDelimiter = ":"
     Public Shared strSourceSQL As String
     Private Title = "QuNect ETL"
     Private destinationFieldNodes As New Dictionary(Of String, qdbField)
@@ -85,18 +87,23 @@ Public Class frmETL
         destination
     End Enum
 
-
     Private Sub restore_Load(sender As Object, e As EventArgs) Handles Me.Load
         cmdLineArgs = System.Environment.GetCommandLineArgs()
         If cmdLineArgs.Length > 1 Then
             automode = True
             Dim cnfg As New config
             loadConfig(cmdLineArgs(1), cnfg)
+            strSourceSQL = cnfg.srcSQL
             Dim cnctStrings As connectionStrings
             cnctStrings.src = "DSN=" & cnfg.DSN & ";"
             cnctStrings.dst = getQDBConnectionString(True, cnfg.uid, cnfg.pwd, cnfg.server, cnfg.apptoken, cnfg.pwdIsPassword)
-            listDestinationFields(cnfg.dbid)
-            executeUpload(cnctStrings, New ArrayList(cnfg.fidsForImport.Split(".")), New ArrayList(cnfg.sourceFieldOrdinals.Split(".")), cnfg.srcSQL)
+            Dim fidsForImport = New ArrayList(cnfg.fidsForImport.Split(fieldDelimter))
+            Dim fieldNodes As New ArrayList
+            For Each field In fidsForImport
+                Dim fidType As New ArrayList(CStr(field).Split(fieldTypeDelimiter))
+                fieldNodes.Add(New qdbField(fidType(0).substring(3), fidType(0), fidType(1), "", False, False, fidType(1), 0))
+            Next
+            executeUpload(cnctStrings, cnfg.dbid, fieldNodes, New ArrayList(cnfg.sourceFieldOrdinals.Split(".")), strSourceSQL)
             Me.Close()
             Exit Sub
         Else
@@ -162,7 +169,7 @@ Public Class frmETL
                     Exit For
                 End If
                 sourceFieldOrdinals &= "." & i
-                fidsForImport &= "." & fieldNode.fid
+                fidsForImport &= fieldDelimter & fieldNode.fid & fieldTypeDelimiter & fieldNode.base_type
             Next
             strJob &= vbCrLf & sourceFieldOrdinals.Substring(1)
             strJob &= vbCrLf & fidsForImport.Substring(1)
@@ -177,7 +184,6 @@ Public Class frmETL
     Sub loadConfig(filename As String)
         Dim cnfg As New config
         loadConfig(filename, cnfg)
-
         txtUsername.Text = cnfg.uid
         txtPassword.Text = cnfg.pwd
         cmbPassword.SelectedIndex = CInt(cnfg.pwdIsPassword)
@@ -205,7 +211,17 @@ Public Class frmETL
         jobFileReader = My.Computer.FileSystem.OpenTextFileReader(filename)
         cnfg.uid = jobFileReader.ReadLine()
         cnfg.pwd = jobFileReader.ReadLine()
-        cnfg.pwdIsPassword = jobFileReader.ReadLine()
+        Dim pwdIsPassword As String = jobFileReader.ReadLine()
+        Select Case pwdIsPassword
+
+            Case "1"
+                cnfg.pwdIsPassword = True
+            Case "2"
+                cnfg.pwdIsPassword = False
+            Case Else
+                cnfg.pwdIsPassword = False
+        End Select
+
         cnfg.server = jobFileReader.ReadLine()
         cnfg.apptoken = jobFileReader.ReadLine()
         cnfg.dbid = jobFileReader.ReadLine()
@@ -400,7 +416,7 @@ Public Class frmETL
         Dim destinationFields As New ArrayList
         Dim sourceFieldOrdinals As New ArrayList
         Dim fidsForImport As New HashSet(Of String)
-        Dim strSQL As String = "INSERT INTO """ & lblDestinationTable.Text & """ (fid"
+
 
         For i As Integer = 0 To dgMapping.Rows.Count - 1
             Dim destComboBoxCell As DataGridViewComboBoxCell = DirectCast(dgMapping.Rows(i).Cells(mapping.destination), System.Windows.Forms.DataGridViewComboBoxCell)
@@ -432,18 +448,18 @@ Public Class frmETL
             VolatileWrite(copyFinished, True)
             Return False
         End If
-        Return executeUpload(cnctStrings, destinationFields, sourceFieldOrdinals, strSQL)
+        Return executeUpload(cnctStrings, lblDestinationTable.Text, destinationFields, sourceFieldOrdinals, strSourceSQL)
     End Function
-    Private Function executeUpload(cnctStrings As connectionStrings, destinationFields As ArrayList, sourceFieldOrdinals As ArrayList, strSQL As String) As Boolean
+    Private Function executeUpload(cnctStrings As connectionStrings, DBID As String, destinationFields As ArrayList, sourceFieldOrdinals As ArrayList, strSourceSQL As String) As Boolean
         Try
-
+            Dim strDestinationSQL As String = "INSERT INTO """ & DBID & """ (fid"
             Dim quNectConn As OdbcConnection = getquNectConn(cnctStrings.dst)
-            strSQL &= String.Join(", fid", destinationFields.ToArray) & ") VALUES ("
+            strDestinationSQL &= String.Join(", fid", destinationFields.ToArray) & ") VALUES ("
             For Each var In destinationFields
-                strSQL &= "?,"
+                strDestinationSQL &= "?,"
             Next
-            strSQL = strSQL.Substring(0, strSQL.Length - 1) & ")"
-            Using command As OdbcCommand = New OdbcCommand(strSQL, quNectConn)
+            strDestinationSQL = strDestinationSQL.Substring(0, strDestinationSQL.Length - 1) & ")"
+            Using command As OdbcCommand = New OdbcCommand(strDestinationSQL, quNectConn)
                 For Each field In destinationFields
                     Dim qdbType As OdbcType
                     qdbType = getODBCTypeFromQuickBaseFieldNode(field)
