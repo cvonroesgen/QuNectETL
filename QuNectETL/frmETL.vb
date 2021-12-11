@@ -186,7 +186,11 @@ Public Class frmETL
         loadConfig(filename, cnfg)
         txtUsername.Text = cnfg.uid
         txtPassword.Text = cnfg.pwd
-        cmbPassword.SelectedIndex = CInt(cnfg.pwdIsPassword)
+        If cnfg.pwdIsPassword Then
+            cmbPassword.SelectedIndex = 1
+        Else
+            cmbPassword.SelectedIndex = 2
+        End If
         txtServer.Text = cnfg.server
         txtAppToken.Text = cnfg.apptoken
         lblDestinationTable.Text = cnfg.dbid
@@ -197,10 +201,12 @@ Public Class frmETL
         strSourceSQL = cnfg.srcSQL
         Dim fidsToLabels As Dictionary(Of String, String) = listFields(lblDestinationTable.Text, strSourceSQL)
         Dim ordinals As String() = sourceFieldOrdinals.Split(".")
-        Dim fids As String() = fidsForImport.Split(".")
+        Dim fids As String() = fidsForImport.Split(fieldDelimter)
         For i As Integer = 0 To ordinals.Count - 1
             Dim destComboBoxCell As DataGridViewComboBoxCell = dgMapping.Rows(CInt(ordinals(i))).Cells(mapping.destination)
-            destComboBoxCell.Value = fidsToLabels(fids(i))
+            Dim fidType As New ArrayList(fids(i).Split(fieldTypeDelimiter))
+            Dim fid As String = fidType(0)
+            destComboBoxCell.Value = fidsToLabels(fid.Substring(3))
         Next
     End Sub
     Sub loadConfig(filename As String, ByRef cnfg As config)
