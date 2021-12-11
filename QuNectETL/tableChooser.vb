@@ -19,21 +19,12 @@
             Me.Hide()
             Exit Sub
         End If
-        Dim tableLabel As Label
-        If frmETL.sourceOrDestination = frmETL.tableType.sourceCatalog Then
-            frmETL.lblCatalog.Tag = tvAppsTables.SelectedNode.Tag
-            frmETL.lblCatalog.Text = tvAppsTables.SelectedNode.FullPath()
-            hideButtons()
-            Me.Hide()
-            Return
-        Else
-            tableLabel = frmETL.lblDestinationTable
-        End If
 
-        If tvAppsTables.SelectedNode.Level <> 1 And frmETL.sourceOrDestination <> frmETL.tableType.source Then
-            tableLabel.Text = ""
+
+        If tvAppsTables.SelectedNode.Level <> 1 Then
+            frmETL.lblDestinationTable.Text = ""
         Else
-            tableLabel.Text = tvAppsTables.SelectedNode.FullPath()
+            frmETL.lblDestinationTable.Text = tvAppsTables.SelectedNode.FullPath()
         End If
         hideButtons()
         Me.Hide()

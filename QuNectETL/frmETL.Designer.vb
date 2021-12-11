@@ -43,7 +43,6 @@ Partial Class frmETL
         Me.ckbDetectProxy = New System.Windows.Forms.CheckBox()
         Me.btnListFields = New System.Windows.Forms.Button()
         Me.lblProgress = New System.Windows.Forms.Label()
-        Me.lblCatalog = New System.Windows.Forms.Label()
         Me.cmbPassword = New System.Windows.Forms.ComboBox()
         Me.btnAppToken = New System.Windows.Forms.Button()
         Me.btnUserToken = New System.Windows.Forms.Button()
@@ -51,6 +50,10 @@ Partial Class frmETL
         Me.lblDSN = New System.Windows.Forms.Label()
         Me.cmbDSN = New System.Windows.Forms.ComboBox()
         Me.lblSQL = New System.Windows.Forms.Label()
+        Me.btnSave = New System.Windows.Forms.Button()
+        Me.saveDialog = New System.Windows.Forms.SaveFileDialog()
+        Me.btnLoad = New System.Windows.Forms.Button()
+        Me.openFile = New System.Windows.Forms.OpenFileDialog()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -234,15 +237,6 @@ Partial Class frmETL
         Me.lblProgress.Size = New System.Drawing.Size(0, 20)
         Me.lblProgress.TabIndex = 42
         '
-        'lblCatalog
-        '
-        Me.lblCatalog.AutoSize = True
-        Me.lblCatalog.Location = New System.Drawing.Point(278, 192)
-        Me.lblCatalog.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.lblCatalog.Name = "lblCatalog"
-        Me.lblCatalog.Size = New System.Drawing.Size(0, 20)
-        Me.lblCatalog.TabIndex = 45
-        '
         'cmbPassword
         '
         Me.cmbPassword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
@@ -311,11 +305,35 @@ Partial Class frmETL
         Me.lblSQL.Size = New System.Drawing.Size(0, 20)
         Me.lblSQL.TabIndex = 84
         '
-        'frmCopy
+        'btnSave
+        '
+        Me.btnSave.Location = New System.Drawing.Point(339, 337)
+        Me.btnSave.Name = "btnSave"
+        Me.btnSave.Size = New System.Drawing.Size(114, 42)
+        Me.btnSave.TabIndex = 85
+        Me.btnSave.Text = "Save Job"
+        Me.btnSave.UseVisualStyleBackColor = True
+        '
+        'btnLoad
+        '
+        Me.btnLoad.Location = New System.Drawing.Point(199, 337)
+        Me.btnLoad.Name = "btnLoad"
+        Me.btnLoad.Size = New System.Drawing.Size(119, 40)
+        Me.btnLoad.TabIndex = 86
+        Me.btnLoad.Text = "Load Job"
+        Me.btnLoad.UseVisualStyleBackColor = True
+        '
+        'openFile
+        '
+        Me.openFile.Filter = "QuNect ETL files|*.job"
+        '
+        'frmETL
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(848, 1535)
+        Me.ClientSize = New System.Drawing.Size(817, 1535)
+        Me.Controls.Add(Me.btnLoad)
+        Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.lblSQL)
         Me.Controls.Add(Me.lblDSN)
         Me.Controls.Add(Me.cmbDSN)
@@ -323,7 +341,6 @@ Partial Class frmETL
         Me.Controls.Add(Me.btnUserToken)
         Me.Controls.Add(Me.btnAppToken)
         Me.Controls.Add(Me.cmbPassword)
-        Me.Controls.Add(Me.lblCatalog)
         Me.Controls.Add(Me.lblProgress)
         Me.Controls.Add(Me.btnListFields)
         Me.Controls.Add(Me.ckbDetectProxy)
@@ -365,7 +382,6 @@ Partial Class frmETL
     Friend WithEvents Source As DataGridViewTextBoxColumn
     Friend WithEvents Destination As DataGridViewComboBoxColumn
     Friend WithEvents lblProgress As Label
-    Friend WithEvents lblCatalog As Label
     Friend WithEvents cmbPassword As ComboBox
     Friend WithEvents btnAppToken As Button
     Friend WithEvents btnUserToken As Button
@@ -373,4 +389,8 @@ Partial Class frmETL
     Friend WithEvents lblDSN As Label
     Friend WithEvents cmbDSN As ComboBox
     Friend WithEvents lblSQL As Label
+    Friend WithEvents btnSave As Button
+    Friend WithEvents saveDialog As SaveFileDialog
+    Friend WithEvents btnLoad As Button
+    Friend WithEvents openFile As OpenFileDialog
 End Class

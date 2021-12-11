@@ -7,6 +7,20 @@ Public Class frmETL
         Public src As String
         Public dst As String
     End Structure
+
+    Public Structure config
+        Public uid As String
+        Public pwd As String
+        Public server As String
+        Public apptoken As String
+        Public pwdIsPassword As Boolean
+        Public detectProxy As Boolean
+        Public DSN As String
+        Public dbid As String
+        Public sourceFieldOrdinals As String
+        Public fidsForImport As String
+        Public srcSQL As String
+    End Structure
     Private Class qdbField
         Public Sub New(_fid As String, _label As String, _type As String, _parentFieldID As String, _unique As Boolean, _required As Boolean, _base_type As String, _decimal_places As Integer)
             fid = _fid
@@ -41,11 +55,12 @@ Public Class frmETL
             Return label
         End Function
     End Class
-
+    Private cmdLineArgs() As String
+    Private automode As Boolean = True
     Private Const AppName = "QuNectETL"
-    Public Shared strSourceSQL As String = "select customer_name as ""Project_Name"" from flash_entries limit 10"
+    Public Shared strSourceSQL As String
     Private Title = "QuNect ETL"
-    Private destinationFieldNodes As Dictionary(Of String, qdbField)
+    Private destinationFieldNodes As New Dictionary(Of String, qdbField)
     Private qdbConnections As New Dictionary(Of String, OdbcConnection)
     Private rids As HashSet(Of String)
     Private keyfid As String
@@ -69,13 +84,24 @@ Public Class frmETL
         source
         destination
     End Enum
-    Enum tableType
-        source
-        destination
-        sourceCatalog
-    End Enum
-    Public sourceOrDestination As tableType
+
+
     Private Sub restore_Load(sender As Object, e As EventArgs) Handles Me.Load
+        cmdLineArgs = System.Environment.GetCommandLineArgs()
+        If cmdLineArgs.Length > 1 Then
+            automode = True
+            Dim cnfg As New config
+            loadConfig(cmdLineArgs(1), cnfg)
+            Dim cnctStrings As connectionStrings
+            cnctStrings.src = "DSN=" & cnfg.DSN & ";"
+            cnctStrings.dst = getQDBConnectionString(True, cnfg.uid, cnfg.pwd, cnfg.server, cnfg.apptoken, cnfg.pwdIsPassword)
+            listDestinationFields(cnfg.dbid)
+            executeUpload(cnctStrings, New ArrayList(cnfg.fidsForImport.Split(".")), New ArrayList(cnfg.sourceFieldOrdinals.Split(".")), cnfg.srcSQL)
+            Me.Close()
+            Exit Sub
+        Else
+            automode = False
+        End If
         Dim myBuildInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
         Title &= " " & myBuildInfo.ProductVersion
         Text = Title
@@ -99,7 +125,101 @@ Public Class frmETL
         lblSQL.Text = strSourceSQL
         showHideControls()
     End Sub
+    Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
+        saveDialog.Filter = "JOB Files (*.job)|*.job"
+        If saveDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
+            Dim strJob As String = txtUsername.Text
+            strJob &= vbCrLf & txtPassword.Text
+            strJob &= vbCrLf & cmbPassword.SelectedIndex
+            strJob &= vbCrLf & txtServer.Text
+            strJob &= vbCrLf & txtAppToken.Text
+            strJob &= vbCrLf & lblDestinationTable.Text
+            If ckbDetectProxy.Checked Then
+                strJob &= vbCrLf & "1"
+            Else
+                strJob &= vbCrLf & "0"
+            End If
+            strJob &= vbCrLf & cmbDSN.Text
+            Dim sourceFieldOrdinals As String = ""
+            Dim fidsForImport As String = ""
+            For i As Integer = 0 To dgMapping.Rows.Count - 1
+                Dim destComboBoxCell As DataGridViewComboBoxCell = dgMapping.Rows(i).Cells(mapping.destination)
+                If destComboBoxCell.Value Is Nothing Then Continue For
+                Dim destDDIndex = destComboBoxCell.Items.IndexOf(destComboBoxCell.Value)
+                If destDDIndex = 0 Then Continue For
 
+                Dim fieldNode As qdbField
+                fieldNode = destinationFieldNodes(destinationLabelsToFids(destComboBoxCell.Value))
+
+                If keyfid = "3" And fieldNode.fid = "3" Then
+                    Dim copyAnyway As MsgBoxResult = Alert("Copying into the key field " & fieldNode.label & " will update existing records without creating New records. Do you want To Continue?", MsgBoxStyle.YesNo)
+                    If copyAnyway = MsgBoxResult.No Then
+                        Exit For
+                    End If
+                End If
+                If fidsForImport.Contains(fieldNode.fid) Then
+                    Alert("You cannot import two different columns into the same field: " & destComboBoxCell.Value, MsgBoxStyle.OkOnly, AppName)
+                    Exit For
+                End If
+                sourceFieldOrdinals &= "." & i
+                fidsForImport &= "." & fieldNode.fid
+            Next
+            strJob &= vbCrLf & sourceFieldOrdinals.Substring(1)
+            strJob &= vbCrLf & fidsForImport.Substring(1)
+            strJob &= vbCrLf
+            strJob &= vbCrLf & strSourceSQL
+            My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False)
+        End If
+    End Sub
+    Private Sub btnLoad_Click(sender As Object, e As EventArgs) Handles btnLoad.Click
+        loadConfig("")
+    End Sub
+    Sub loadConfig(filename As String)
+        Dim cnfg As New config
+        loadConfig(filename, cnfg)
+
+        txtUsername.Text = cnfg.uid
+        txtPassword.Text = cnfg.pwd
+        cmbPassword.SelectedIndex = CInt(cnfg.pwdIsPassword)
+        txtServer.Text = cnfg.server
+        txtAppToken.Text = cnfg.apptoken
+        lblDestinationTable.Text = cnfg.dbid
+        ckbDetectProxy.Checked = cnfg.detectProxy
+        cmbDSN.SelectedIndex = cmbDSN.FindStringExact(cnfg.DSN)
+        Dim sourceFieldOrdinals As String = cnfg.sourceFieldOrdinals
+        Dim fidsForImport As String = cnfg.fidsForImport
+        strSourceSQL = cnfg.srcSQL
+        Dim fidsToLabels As Dictionary(Of String, String) = listFields(lblDestinationTable.Text, strSourceSQL)
+        Dim ordinals As String() = sourceFieldOrdinals.Split(".")
+        Dim fids As String() = fidsForImport.Split(".")
+        For i As Integer = 0 To ordinals.Count - 1
+            Dim destComboBoxCell As DataGridViewComboBoxCell = dgMapping.Rows(CInt(ordinals(i))).Cells(mapping.destination)
+            destComboBoxCell.Value = fidsToLabels(fids(i))
+        Next
+    End Sub
+    Sub loadConfig(filename As String, ByRef cnfg As config)
+        If Not automode AndAlso openFile.ShowDialog = Windows.Forms.DialogResult.OK Then
+            filename = openFile.FileName
+        End If
+        Dim jobFileReader As System.IO.StreamReader
+        jobFileReader = My.Computer.FileSystem.OpenTextFileReader(filename)
+        cnfg.uid = jobFileReader.ReadLine()
+        cnfg.pwd = jobFileReader.ReadLine()
+        cnfg.pwdIsPassword = jobFileReader.ReadLine()
+        cnfg.server = jobFileReader.ReadLine()
+        cnfg.apptoken = jobFileReader.ReadLine()
+        cnfg.dbid = jobFileReader.ReadLine()
+        cnfg.detectProxy = CBool(jobFileReader.ReadLine())
+        cnfg.DSN = jobFileReader.ReadLine()
+        cnfg.sourceFieldOrdinals = jobFileReader.ReadLine()
+        cnfg.fidsForImport = jobFileReader.ReadLine()
+        jobFileReader.ReadLine()
+        cnfg.srcSQL = ""
+        While Not jobFileReader.EndOfStream
+            cnfg.srcSQL &= jobFileReader.ReadLine()
+        End While
+        jobFileReader.Close()
+    End Sub
     Sub showHideControls()
         cmbPassword.Visible = txtUsername.Text.Length > 0
         txtPassword.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex <> 0
@@ -113,6 +233,7 @@ Public Class frmETL
         btnDestination.Visible = True
         btnImport.Visible = False
         dgMapping.Visible = False
+        btnSave.Visible = False
 
 
         If lblDestinationTable.Text <> "" Then
@@ -128,6 +249,7 @@ Public Class frmETL
         If dgMapping.RowCount > 0 Then
             dgMapping.Visible = True
             btnImport.Visible = True
+            btnSave.Visible = True
         End If
     End Sub
     Private Sub txtServer_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtServer.TextChanged
@@ -163,25 +285,31 @@ Public Class frmETL
 
         showHideControls()
     End Sub
-
-    Private Function getConnectionString(usefids As Boolean, useAppDBID As Boolean) As String
-
-        getConnectionString = "Driver={QuNect ODBC For QuickBase};FIELDNAMECHARACTERS=all;ALLREVISIONS=ALL;uid=" & txtUsername.Text & ";pwd=" & txtPassword.Text & ";QUICKBASESERVER=" & txtServer.Text & ";APPTOKEN=" & txtAppToken.Text
-        If usefids Then
-            getConnectionString &= ";USEFIDS=1"
-        End If
-        If useAppDBID Then
-            getConnectionString &= ";APPID=" & lblCatalog.Tag
-        End If
+    Private Function getConnectionString(usefids As Boolean) As String
+        Dim pwdIsPassword As Boolean
         If cmbPassword.SelectedIndex = 0 Then
             cmbPassword.Focus()
             Throw New System.Exception("Please indicate whether you are Using a password Or a user token.")
             Return ""
         ElseIf cmbPassword.SelectedIndex = 1 Then
-            getConnectionString &= ";PWDISPASSWORD=1"
+            pwdIsPassword = True
         Else
-            getConnectionString &= ";PWDISPASSWORD=0"
+            pwdIsPassword = False
         End If
+        Return getQDBConnectionString(usefids, txtUsername.Text, txtPassword.Text, txtServer.Text, txtAppToken.Text, pwdIsPassword)
+    End Function
+    Private Function getQDBConnectionString(usefids As Boolean, txtUsername As String, txtPassword As String, txtServer As String, txtAppToken As String, pwdIsPassword As Boolean) As String
+
+        getQDBConnectionString = "Driver={QuNect ODBC For QuickBase};FIELDNAMECHARACTERS=all;ALLREVISIONS=ALL;uid=" & txtUsername & ";pwd=" & txtPassword & ";QUICKBASESERVER=" & txtServer & ";APPTOKEN=" & txtAppToken
+        If usefids Then
+            getQDBConnectionString &= ";USEFIDS=1"
+        End If
+        If pwdIsPassword Then
+            getQDBConnectionString &= ";PWDISPASSWORD=1"
+        Else
+            getQDBConnectionString &= ";PWDISPASSWORD=0"
+        End If
+
     End Function
     Function countRecords(sql As String, connection As OdbcConnection) As Integer
         Using command As OdbcCommand = New OdbcCommand(sql, connection)
@@ -198,8 +326,12 @@ Public Class frmETL
             End If
         End Using
     End Function
-    Function setODBCParameter(val As String, fid As String, command As OdbcCommand, ByRef fileLineCounter As Integer, ByRef conversionErrors As String) As Boolean
+    Function setODBCParameter(val As Object, fid As String, command As OdbcCommand, ByRef fileLineCounter As Integer, ByRef conversionErrors As String) As Boolean
         Dim qdbType As OdbcType = command.Parameters("@fid" & fid).OdbcType
+        If IsDBNull(val) Then
+            command.Parameters("@fid" & fid).Value = val
+            Return False
+        End If
         Try
             Select Case qdbType
                 Case OdbcType.Int
@@ -212,11 +344,11 @@ Public Class frmETL
                 Case OdbcType.Double, OdbcType.Numeric
                     command.Parameters("@fid" & fid).Value = Convert.ToDouble(val)
                 Case OdbcType.Date
-                    command.Parameters("@fid" & fid).Value = Date.Parse(val)
+                    command.Parameters("@fid" & fid).Value = val
                 Case OdbcType.DateTime
-                    command.Parameters("@fid" & fid).Value = DateTime.Parse(val)
+                    command.Parameters("@fid" & fid).Value = Convert.ToDateTime(val)
                 Case OdbcType.Time
-                    command.Parameters("@fid" & fid).Value = TimeSpan.Parse(val)
+                    command.Parameters("@fid" & fid).Value = val
                 Case OdbcType.Bit
                     Dim match As Match = isBooleanTrue.Match(val)
                     If match.Success Then
@@ -264,14 +396,12 @@ Public Class frmETL
         Return OdbcType.VarChar
     End Function
 
-    Private Function copyTable(cnctStrings As connectionStrings) As Boolean
-
+    Private Function uploadToQuickbase(cnctStrings As connectionStrings) As Boolean
         Dim destinationFields As New ArrayList
         Dim sourceFieldOrdinals As New ArrayList
         Dim fidsForImport As New HashSet(Of String)
         Dim strSQL As String = "INSERT INTO """ & lblDestinationTable.Text & """ (fid"
 
-        Dim strSQLParameters = "("
         For i As Integer = 0 To dgMapping.Rows.Count - 1
             Dim destComboBoxCell As DataGridViewComboBoxCell = DirectCast(dgMapping.Rows(i).Cells(mapping.destination), System.Windows.Forms.DataGridViewComboBoxCell)
             If destComboBoxCell.Value Is Nothing Then Continue For
@@ -279,19 +409,17 @@ Public Class frmETL
             If destDDIndex = 0 Then Continue For
 
             Dim fieldNode As qdbField
-
-
             fieldNode = destinationFieldNodes(destinationLabelsToFids(destComboBoxCell.Value))
 
-            If keyfid = "3" And fieldNode.fid = "3" Then
-                Dim copyAnyway As MsgBoxResult = MsgBox("Copying into the key field " & fieldNode.label & " will update existing records without creating New records. Do you want To Continue?", MsgBoxStyle.YesNo)
+            If keyfid = "3" And fieldNode.fid = "3" And Not automode Then
+                Dim copyAnyway As MsgBoxResult = Alert("Copying into the key field " & fieldNode.label & " will update existing records without creating New records. Do you want To Continue?", MsgBoxStyle.YesNo)
                 If copyAnyway = MsgBoxResult.No Then
                     VolatileWrite(copyFinished, True)
                     Return False
                 End If
             End If
-            If fidsForImport.Contains(fieldNode.fid) Then
-                MsgBox("You cannot import two different columns into the same field: " & destComboBoxCell.Value, MsgBoxStyle.OkOnly, AppName)
+            If fidsForImport.Contains(fieldNode.fid) And Not automode Then
+                Alert("You cannot import two different columns into the same field: " & destComboBoxCell.Value, MsgBoxStyle.OkOnly, AppName)
                 VolatileWrite(copyFinished, True)
                 Return False
             End If
@@ -299,11 +427,14 @@ Public Class frmETL
             destinationFields.Add(fieldNode)
             sourceFieldOrdinals.Add(i)
         Next
-        If fidsForImport.Count = 0 Then
-            MsgBox("You must map at least one field from the source table to the destination table.", MsgBoxStyle.OkOnly, AppName)
+        If fidsForImport.Count = 0 And Not automode Then
+            Alert("You must map at least one field from the source table to the destination table.", MsgBoxStyle.OkOnly, AppName)
             VolatileWrite(copyFinished, True)
             Return False
         End If
+        Return executeUpload(cnctStrings, destinationFields, sourceFieldOrdinals, strSQL)
+    End Function
+    Private Function executeUpload(cnctStrings As connectionStrings, destinationFields As ArrayList, sourceFieldOrdinals As ArrayList, strSQL As String) As Boolean
         Try
 
             Dim quNectConn As OdbcConnection = getquNectConn(cnctStrings.dst)
@@ -337,28 +468,58 @@ Public Class frmETL
                     Dim dr As OdbcDataReader
                     Try
                         dr = srcCmd.ExecuteReader()
+                        Dim rowCount As Integer = 0
+                        While (dr.Read())
+                            fileLineCounter += 1
+                            For i As Integer = 0 To sourceFieldOrdinals.Count - 1
+                                If setODBCParameter(dr.GetValue(sourceFieldOrdinals(i)), destinationFields(i).fid, command, fileLineCounter, conversionErrors) Then
+                                    Exit While
+                                End If
+                            Next
+                            rowCount = command.ExecuteNonQuery()
+                        End While
+                        transaction.Commit()
+                        If Not automode Then
+                            Alert(rowCount & " rows were uploaded to Quickbase.")
+                        End If
                     Catch excpt As Exception
-                        Throw New System.Exception("Could not get records from " & cmbDSN.Text & vbCrLf & excpt.Message)
+                        srcCmd.Cancel()
+                        srcCmd.Dispose()
+                        transaction.Rollback()
+                        srcConnection.Close()
+                        Throw New System.Exception("Could not get record " & fileLineCounter & " from " & cnctStrings.src & vbCrLf & excpt.Message)
                     End Try
-                    While (dr.Read())
-                        fileLineCounter += 1
-                        For i As Integer = 0 To sourceFieldOrdinals.Count - 1
-                            If setODBCParameter(dr.GetValue(sourceFieldOrdinals(i)), fidsForImport(i), command, fileLineCounter, conversionErrors) Then
-                                Exit While
-                            End If
-                        Next
-                        Dim j As Integer = command.ExecuteNonQuery()
-                    End While
-                    transaction.Commit()
+
                 End Using
             End Using
 
         Catch ex As Exception
-            MsgBox("Could Not copy because " & ex.Message)
+            Alert("Could Not copy because " & ex.Message)
         End Try
         VolatileWrite(copyFinished, True)
         Return True
 
+    End Function
+    Function Alert(msg As String) As MsgBoxResult
+        If automode Then
+            Throw New System.Exception(msg)
+        Else
+            Return MsgBox(msg)
+        End If
+    End Function
+    Function Alert(msg As String, style As MsgBoxStyle) As MsgBoxResult
+        If automode Then
+            Throw New System.Exception(msg)
+        Else
+            Return MsgBox(msg, style)
+        End If
+    End Function
+    Function Alert(msg As String, style As MsgBoxStyle, title As String) As MsgBoxResult
+        If automode Then
+            Throw New System.Exception(msg)
+        Else
+            Return MsgBox(msg, style, title)
+        End If
     End Function
     Private Function getquNectConn(connectionString As String) As OdbcConnection
         If qdbConnections.ContainsKey(connectionString) Then
@@ -370,9 +531,9 @@ Public Class frmETL
         Catch excpt As Exception
             Me.Cursor = Cursors.Default
             If excpt.Message.StartsWith("Error [IM003]") Or excpt.Message.Contains("Data source name Not found") Then
-                MsgBox("Please install QuNect ODBC For QuickBase from http://qunect.com/download/QuNect.exe and try again.")
+                Alert("Please install QuNect ODBC For QuickBase from http://qunect.com/download/QuNect.exe and try again.")
             Else
-                MsgBox(excpt.Message.Substring(13))
+                Alert(excpt.Message.Substring(13))
             End If
             Return Nothing
             Exit Function
@@ -385,7 +546,7 @@ Public Class frmETL
         qdbVer.major = CInt(m.Groups(2).Value)
         qdbVer.minor = CInt(m.Groups(3).Value)
         If (qdbVer.major < 7) Or (qdbVer.major = 7 And qdbVer.minor < 37) Then
-            MsgBox("You are running the " & ver & " version of QuNect ODBC for QuickBase. Please install the latest version from http://qunect.com/download/QuNect.exe")
+            Alert("You are running the " & ver & " version of QuNect ODBC for QuickBase. Please install the latest version from http://qunect.com/download/QuNect.exe")
             quNectConn.Close()
             Me.Cursor = Cursors.Default
             Return Nothing
@@ -395,22 +556,15 @@ Public Class frmETL
         Return quNectConn
     End Function
 
-    Private Sub btnSource_Click(sender As Object, e As EventArgs)
-        sourceOrDestination = tableType.source
-        listTables()
-    End Sub
+
 
     Private Sub btnDestination_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDestination.Click
-        sourceOrDestination = tableType.destination
         listTables()
     End Sub
     Private Sub listTables()
         Me.Cursor = Cursors.WaitCursor
         Try
-            Dim connectionString As String = getConnectionString(False, False)
-            If sourceOrDestination = tableType.source Then
-                connectionString = getConnectionString(False, True)
-            End If
+            Dim connectionString As String = getConnectionString(False)
             Dim quNectConn As OdbcConnection = getquNectConn(connectionString)
             Dim tables As DataTable = quNectConn.GetSchema("Tables")
             Dim views As DataTable = quNectConn.GetSchema("Views")
@@ -418,12 +572,12 @@ Public Class frmETL
             listTablesFromGetSchema(tables)
 
         Catch ex As Exception
-            MsgBox("Could not list tables because " & ex.Message)
+            Alert("Could not list tables because " & ex.Message)
         End Try
     End Sub
     Sub listCatalogs()
         Try
-            Dim connectionString As String = getConnectionString(False, False)
+            Dim connectionString As String = getConnectionString(False)
             Dim quNectConn As OdbcConnection = getquNectConn(connectionString)
             Using quNectCmd = New OdbcCommand("SELECT * FROM CATALOGS", quNectConn)
                 Dim dr As OdbcDataReader = quNectCmd.ExecuteReader()
@@ -439,7 +593,7 @@ Public Class frmETL
                 frmTableChooser.tvAppsTables.EndUpdate()
             End Using
         Catch ex As Exception
-            MsgBox("Could not list catalogs because " & ex.Message)
+            Alert("Could not list catalogs because " & ex.Message)
             Exit Sub
         End Try
         frmTableChooser.Show()
@@ -493,17 +647,15 @@ Public Class frmETL
         frmTableChooser.Show()
         Me.Cursor = Cursors.Default
     End Sub
-    Sub listFields(destinationDBID As String)
-        sourceLabelToFieldType = New Dictionary(Of String, String)
+    Function listDestinationFields(destinationDBID As String) As Dictionary(Of String, String)
         destinationLabelsToFids = New Dictionary(Of String, String)
-        sourceLabelsToFids = New Dictionary(Of String, String)
         Dim destinationFIDtoLabel As New Dictionary(Of String, String)
-        destinationFieldNodes = New Dictionary(Of String, qdbField)
-
+        destinationFieldNodes.Clear()
+        listDestinationFields = destinationFIDtoLabel
         Try
-            Dim connectionString As String = getConnectionString(False, True)
+            Dim connectionString As String = getConnectionString(False)
             Dim connection As OdbcConnection = getquNectConn(connectionString)
-            If connection Is Nothing Then Exit Sub
+            If connection Is Nothing Then Exit Function
             Dim strSQL As String = "SELECT label, fid, field_type, parentFieldID, ""isunique"", required, ""iskey"", base_type, decimal_places  FROM """ & destinationDBID & "~fields"" WHERE (mode = '' and role = '') or fid = '3'"
 
             Using quNectCmd As OdbcCommand = New OdbcCommand(strSQL, connection)
@@ -514,9 +666,8 @@ Public Class frmETL
                     Throw New System.Exception("Could not get field information for " & destinationDBID & vbCrLf & excpt.Message)
                 End Try
                 If Not dr.HasRows Then
-                    Exit Sub
+                    Exit Function
                 End If
-
 
                 'Loop through all of the fields in the schema.
                 DirectCast(dgMapping.Columns(mapping.destination), System.Windows.Forms.DataGridViewComboBoxColumn).Items.Clear()
@@ -540,13 +691,21 @@ Public Class frmETL
                 End While
                 dr.Close()
             End Using
+
+        Catch ex As Exception
+            Alert(ex.Message)
+        End Try
+    End Function
+    Function listFields(destinationDBID As String, strSourceSQL As String) As Dictionary(Of String, String)
+        listFields = listDestinationFields(destinationDBID)
+        Try
             'here we need to open the source and get the field names
-
-            sourceFieldNames.Clear()
-
             Dim srcConnection As OdbcConnection
             srcConnection = New OdbcConnection("DSN=" & cmbDSN.Text & ";")
             srcConnection.Open()
+
+            sourceFieldNames.Clear()
+            sourceLabelToFieldType = New Dictionary(Of String, String)
 
             Using srcCmd As OdbcCommand = New OdbcCommand(strSourceSQL, srcConnection)
                 Dim dr As OdbcDataReader
@@ -562,7 +721,6 @@ Public Class frmETL
                     Throw New System.Exception("Could not get field information for " & cmbDSN.Text & excpt.Message)
                 End Try
 
-
                 dgMapping.Rows.Clear()
                 Dim i As Integer = 0
                 For Each columnRow As DataRow In sourceColumns.Rows
@@ -575,20 +733,16 @@ Public Class frmETL
                 dr.Close()
             End Using
 
-
             For Each row In dgMapping.Rows
                 guessDestination(row.Cells(mapping.source).Value, row.Index)
             Next
-            btnImport.Visible = True
-
-            dgMapping.Visible = True
+            showHideControls()
 
             Me.Cursor = Cursors.Default
         Catch ex As Exception
-            MsgBox(ex.Message)
+            Alert(ex.Message)
         End Try
-
-    End Sub
+    End Function
     Sub guessDestination(sourceFieldName As String, sourceFieldOrdinal As Integer)
 
         For Each field As KeyValuePair(Of String, qdbField) In destinationFieldNodes
@@ -601,23 +755,26 @@ Public Class frmETL
     End Sub
 
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
+        import()
+    End Sub
+    Sub import()
         VolatileWrite(copyFinished, False)
         pb.Visible = True
         Dim cnctStrings As connectionStrings
         cnctStrings.src = "DSN=" & cmbDSN.Text & ";"
-        cnctStrings.dst = getConnectionString(True, False)
-        Dim copyThread As System.Threading.Thread = New Threading.Thread(AddressOf copyTable)
+        cnctStrings.dst = getConnectionString(True)
+        Dim copyThread As System.Threading.Thread = New Threading.Thread(AddressOf uploadToQuickbase)
         copyThread.Start(cnctStrings)
     End Sub
 
     Private Sub btnListFields_Click(sender As Object, e As EventArgs) Handles btnListFields.Click
         If lblDestinationTable.Text = "" Then
-            MsgBox("Please choose a table to copy into.", MsgBoxStyle.OkOnly, AppName)
+            Alert("Please choose a table to copy into.", MsgBoxStyle.OkOnly, AppName)
             Me.Cursor = Cursors.Default
             Exit Sub
         End If
         Me.Cursor = Cursors.WaitCursor
-        listFields(lblDestinationTable.Text)
+        listFields(lblDestinationTable.Text, strSourceSQL)
         Me.Cursor = Cursors.Default
     End Sub
 
@@ -634,7 +791,7 @@ Public Class frmETL
 
     Private Sub showProgress()
         Try
-            Dim quNectConn As OdbcConnection = New OdbcConnection(getConnectionString(True, False))
+            Dim quNectConn As OdbcConnection = New OdbcConnection(getConnectionString(True))
             quNectConn.Open()
             Dim pbValue As Integer
             While Not VolatileRead(copyFinished)
@@ -654,7 +811,7 @@ Public Class frmETL
             SetLabelProgress("")
             SetPBProgress(copyCount + existingCount)
         Catch ex As Exception
-            'MsgBox(ex.Message)
+            'Alert(ex.Message)
         End Try
     End Sub
     Delegate Sub LabelDelegate(progressMessage As String)
@@ -748,6 +905,9 @@ Public Class frmETL
         frmSQL.Show()
         Me.Cursor = Cursors.Default
     End Sub
+
+
+
 
 End Class
 
