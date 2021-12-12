@@ -29,7 +29,7 @@
     <ErrorReportUrl>http://www.qunect.com</ErrorReportUrl>
     <ProductName>QuNect Copy</ProductName>
     <PublisherName>QuNect</PublisherName>
-    <ApplicationRevision>15</ApplicationRevision>
+    <ApplicationRevision>16</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -69,10 +69,10 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>10501FD56F3DEA5577ECABBFEF28D8E9C79574DB</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>33507C0B6EA299C179552EABEECBD00EA1B24831</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -81,7 +81,7 @@
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>QuNectCopy.ico</ApplicationIcon>
+    <ApplicationIcon>QuNectETL.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -239,7 +239,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="QuNectCopy.ico" />
+    <Content Include="QuNectETL.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
