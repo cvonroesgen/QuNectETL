@@ -114,6 +114,7 @@ Public Class frmETL
     End Enum
     Private logFile As StreamWriter
     Private Sub restore_Load(sender As Object, e As EventArgs) Handles Me.Load
+        dgMapping.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         cmdLineArgs = System.Environment.GetCommandLineArgs()
         If cmdLineArgs.Length > arg.configFile Then
             automode = True
