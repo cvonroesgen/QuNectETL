@@ -31,7 +31,6 @@ Partial Class frmETL
         Me.Destination = New System.Windows.Forms.DataGridViewComboBoxColumn()
         Me.btnImport = New System.Windows.Forms.Button()
         Me.btnDestination = New System.Windows.Forms.Button()
-        Me.pb = New System.Windows.Forms.ProgressBar()
         Me.lblAppToken = New System.Windows.Forms.Label()
         Me.txtAppToken = New System.Windows.Forms.TextBox()
         Me.lblServer = New System.Windows.Forms.Label()
@@ -125,15 +124,6 @@ Partial Class frmETL
         Me.btnDestination.TabIndex = 4
         Me.btnDestination.Text = "Choose Destination Table..."
         Me.btnDestination.UseVisualStyleBackColor = True
-        '
-        'pb
-        '
-        Me.pb.Location = New System.Drawing.Point(429, 128)
-        Me.pb.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.pb.Maximum = 1000
-        Me.pb.Name = "pb"
-        Me.pb.Size = New System.Drawing.Size(372, 35)
-        Me.pb.TabIndex = 33
         '
         'lblAppToken
         '
@@ -231,7 +221,7 @@ Partial Class frmETL
         'lblProgress
         '
         Me.lblProgress.AutoSize = True
-        Me.lblProgress.Location = New System.Drawing.Point(174, 346)
+        Me.lblProgress.Location = New System.Drawing.Point(438, 128)
         Me.lblProgress.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblProgress.Name = "lblProgress"
         Me.lblProgress.Size = New System.Drawing.Size(0, 20)
@@ -345,7 +335,6 @@ Partial Class frmETL
         Me.Controls.Add(Me.btnListFields)
         Me.Controls.Add(Me.ckbDetectProxy)
         Me.Controls.Add(Me.lblDestinationTable)
-        Me.Controls.Add(Me.pb)
         Me.Controls.Add(Me.lblAppToken)
         Me.Controls.Add(Me.txtAppToken)
         Me.Controls.Add(Me.lblServer)
@@ -368,7 +357,6 @@ Partial Class frmETL
     Friend WithEvents dgMapping As System.Windows.Forms.DataGridView
     Friend WithEvents btnImport As System.Windows.Forms.Button
     Friend WithEvents btnDestination As System.Windows.Forms.Button
-    Friend WithEvents pb As System.Windows.Forms.ProgressBar
     Friend WithEvents lblAppToken As System.Windows.Forms.Label
     Friend WithEvents txtAppToken As System.Windows.Forms.TextBox
     Friend WithEvents lblServer As System.Windows.Forms.Label

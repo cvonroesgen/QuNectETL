@@ -1,13 +1,24 @@
 ﻿Imports System.ComponentModel
 Imports System.Data.Odbc
 Imports System.Text.RegularExpressions
+Imports System.IO
+Imports System.Threading
+
 
 Public Class frmETL
     Private Structure connectionStrings
         Public src As String
         Public dst As String
     End Structure
-
+    Enum arg
+        configFile = 1
+        logFile = 2
+    End Enum
+    Enum cmbPasswordIndex
+        neither = 0
+        password = 1
+        usertoken = 2
+    End Enum
     Public Structure config
         Public uid As String
         Public pwd As String
@@ -20,6 +31,20 @@ Public Class frmETL
         Public sourceFieldOrdinals As String
         Public fidsForImport As String
         Public srcSQL As String
+        Overrides Function toString() As String
+            Return _
+            "uid: " & uid & vbCrLf _
+            & "pwd: " & pwd & vbCrLf _
+            & "server: " & server & vbCrLf _
+            & "apptoken: " & apptoken & vbCrLf _
+            & "pwdIsPassword: " & pwdIsPassword & vbCrLf _
+            & "detectProxy: " & detectProxy & vbCrLf _
+            & "DSN: " & DSN & vbCrLf _
+            & "dbid: " & dbid & vbCrLf _
+            & "sourceFieldOrdinals: " & sourceFieldOrdinals & vbCrLf _
+            & "fidsForImport: " & fidsForImport & vbCrLf _
+            & "srcSQL: " & srcSQL & vbCrLf
+        End Function
     End Structure
     Private Class qdbField
         Public Sub New(_fid As String, _label As String, _type As String, _parentFieldID As String, _unique As Boolean, _required As Boolean, _base_type As String, _decimal_places As Integer)
@@ -58,9 +83,10 @@ Public Class frmETL
     Private cmdLineArgs() As String
     Private automode As Boolean = True
     Private Const AppName = "QuNectETL"
-    Private Const fieldDelimter = "|fid"
+    Private Const fieldDelimiter = "|"
     Private Const fieldTypeDelimiter = ":"
-    Public Shared strSourceSQL As String
+    Private Const ordinalDelimter = "."
+    Public Shared strSourceSQL As String = ""
     Private Title = "QuNect ETL"
     Private destinationFieldNodes As New Dictionary(Of String, qdbField)
     Private qdbConnections As New Dictionary(Of String, OdbcConnection)
@@ -73,8 +99,8 @@ Public Class frmETL
     Private destinationLabelsToFids As Dictionary(Of String, String)
     Private sourceLabelsToFids As Dictionary(Of String, String)
     Private isBooleanTrue As Regex = New Regex("y|tr|c|[1-9]", RegexOptions.IgnoreCase Or RegexOptions.Compiled)
-    Private copyFinished As Boolean = False
-    Dim copyCount As Integer
+    Private progressMessage As String
+
     Dim existingCount As Integer
     Private Class qdbVersion
         Public year As Integer
@@ -86,25 +112,44 @@ Public Class frmETL
         source
         destination
     End Enum
-
+    Private logFile As StreamWriter
     Private Sub restore_Load(sender As Object, e As EventArgs) Handles Me.Load
         cmdLineArgs = System.Environment.GetCommandLineArgs()
-        If cmdLineArgs.Length > 1 Then
+        If cmdLineArgs.Length > arg.configFile Then
             automode = True
             Dim cnfg As New config
-            loadConfig(cmdLineArgs(1), cnfg)
-            strSourceSQL = cnfg.srcSQL
-            Dim cnctStrings As connectionStrings
-            cnctStrings.src = "DSN=" & cnfg.DSN & ";"
-            cnctStrings.dst = getQDBConnectionString(True, cnfg.uid, cnfg.pwd, cnfg.server, cnfg.apptoken, cnfg.pwdIsPassword)
-            Dim fidsForImport = New ArrayList(cnfg.fidsForImport.Split(fieldDelimter))
-            Dim fieldNodes As New ArrayList
-            For Each field In fidsForImport
-                Dim fidType As New ArrayList(CStr(field).Split(fieldTypeDelimiter))
-                fieldNodes.Add(New qdbField(fidType(0).substring(3), fidType(0), fidType(1), "", False, False, fidType(1), 0))
-            Next
-            executeUpload(cnctStrings, cnfg.dbid, fieldNodes, New ArrayList(cnfg.sourceFieldOrdinals.Split(".")), strSourceSQL)
-            Me.Close()
+            Try
+                If cmdLineArgs.Length > arg.logFile Then
+                    'open log file
+                    logFile = New StreamWriter(File.Open(cmdLineArgs(arg.logFile), FileMode.Append))
+                    logFile.WriteLine()
+                    logFile.WriteLine(DateTime.Now)
+                    logFile.WriteLine("Running Job File: " & cmdLineArgs(arg.configFile))
+                    logFile.Write(cnfg.toString())
+                End If
+                loadConfig(cmdLineArgs(arg.configFile), cnfg)
+                strSourceSQL = cnfg.srcSQL
+                Dim cnctStrings As connectionStrings
+                cnctStrings.src = "DSN=" & cnfg.DSN & ";"
+                cnctStrings.dst = getQDBConnectionString(True, cnfg.uid, cnfg.pwd, cnfg.server, cnfg.apptoken, cnfg.pwdIsPassword)
+                Dim fidsForImport = New ArrayList(cnfg.fidsForImport.Split(fieldDelimiter))
+                Dim fieldNodes As New ArrayList
+                For Each field In fidsForImport
+                    Dim fidType As New ArrayList(CStr(field).Split(fieldTypeDelimiter))
+                    fieldNodes.Add(New qdbField(fidType(0).substring(3), fidType(0), fidType(1), "", False, False, fidType(1), 0))
+                Next
+                executeUpload(cnctStrings, cnfg.dbid, fieldNodes, New ArrayList(cnfg.sourceFieldOrdinals.Split(ordinalDelimter)), strSourceSQL)
+                If cmdLineArgs.Length > arg.logFile Then
+                    logFile.WriteLine(DateTime.Now)
+                    logFile.WriteLine("Finished Job")
+                    logFile.Flush()
+                    logFile.Close()
+                End If
+            Catch excpt As Exception
+                Alert(excpt.Message)
+            Finally
+                Me.Close()
+            End Try
             Exit Sub
         Else
             automode = False
@@ -168,18 +213,28 @@ Public Class frmETL
                     Alert("You cannot import two different columns into the same field: " & destComboBoxCell.Value, MsgBoxStyle.OkOnly, AppName)
                     Exit For
                 End If
-                sourceFieldOrdinals &= "." & i
-                fidsForImport &= fieldDelimter & fieldNode.fid & fieldTypeDelimiter & fieldNode.base_type
+                sourceFieldOrdinals &= ordinalDelimter & i
+                fidsForImport &= fieldDelimiter & "fid" & fieldNode.fid & fieldTypeDelimiter & fieldNode.base_type
             Next
-            strJob &= vbCrLf & sourceFieldOrdinals.Substring(1)
-            strJob &= vbCrLf & fidsForImport.Substring(1)
+            If sourceFieldOrdinals.Length > 0 Then
+                sourceFieldOrdinals = sourceFieldOrdinals.Substring(1)
+            End If
+            If fidsForImport.Length > 0 Then
+                fidsForImport = fidsForImport.Substring(1)
+            End If
+            strJob &= vbCrLf & sourceFieldOrdinals
+            strJob &= vbCrLf & fidsForImport
             strJob &= vbCrLf
             strJob &= vbCrLf & strSourceSQL
             My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False)
         End If
     End Sub
     Private Sub btnLoad_Click(sender As Object, e As EventArgs) Handles btnLoad.Click
-        loadConfig("")
+        Try
+            loadConfig("")
+        Catch excpt As Exception
+            Alert("Could Not load job. " & excpt.Message)
+        End Try
     End Sub
     Sub loadConfig(filename As String)
         Dim cnfg As New config
@@ -187,9 +242,9 @@ Public Class frmETL
         txtUsername.Text = cnfg.uid
         txtPassword.Text = cnfg.pwd
         If cnfg.pwdIsPassword Then
-            cmbPassword.SelectedIndex = 1
+            cmbPassword.SelectedIndex = cmbPasswordIndex.password
         Else
-            cmbPassword.SelectedIndex = 2
+            cmbPassword.SelectedIndex = cmbPasswordIndex.usertoken
         End If
         txtServer.Text = cnfg.server
         txtAppToken.Text = cnfg.apptoken
@@ -199,15 +254,25 @@ Public Class frmETL
         Dim sourceFieldOrdinals As String = cnfg.sourceFieldOrdinals
         Dim fidsForImport As String = cnfg.fidsForImport
         strSourceSQL = cnfg.srcSQL
+        lblSQL.Text = strSourceSQL
+        listFields(lblDestinationTable.Text, strSourceSQL)
         Dim fidsToLabels As Dictionary(Of String, String) = listFields(lblDestinationTable.Text, strSourceSQL)
-        Dim ordinals As String() = sourceFieldOrdinals.Split(".")
-        Dim fids As String() = fidsForImport.Split(fieldDelimter)
-        For i As Integer = 0 To ordinals.Count - 1
-            Dim destComboBoxCell As DataGridViewComboBoxCell = dgMapping.Rows(CInt(ordinals(i))).Cells(mapping.destination)
-            Dim fidType As New ArrayList(fids(i).Split(fieldTypeDelimiter))
-            Dim fid As String = fidType(0)
-            destComboBoxCell.Value = fidsToLabels(fid.Substring(3))
-        Next
+        Dim srcOrdinals As String() = sourceFieldOrdinals.Split(ordinalDelimter)
+        Dim fids As String() = fidsForImport.Split(fieldDelimiter)
+        If srcOrdinals.Length = fids.Length Then
+            For i As Integer = 0 To srcOrdinals.Count - 1
+                If Regex.IsMatch(srcOrdinals(i), "^\d+$") Then
+                    Dim srcOrdinal As Integer = CInt(srcOrdinals(i))
+                    If srcOrdinal > (dgMapping.Rows.Count - 1) Then
+                        Throw New Exception("The source SQL statement has fewer columns than this configuration requires.")
+                    End If
+                    Dim destComboBoxCell As DataGridViewComboBoxCell = dgMapping.Rows(srcOrdinal).Cells(mapping.destination)
+                    Dim fidType As New ArrayList(fids(i).Split(fieldTypeDelimiter))
+                    Dim fid As String = fidType(0)
+                    destComboBoxCell.Value = fidsToLabels(fid.Substring(3))
+                End If
+            Next
+        End If
     End Sub
     Sub loadConfig(filename As String, ByRef cnfg As config)
         If Not automode AndAlso openFile.ShowDialog = Windows.Forms.DialogResult.OK Then
@@ -218,11 +283,10 @@ Public Class frmETL
         cnfg.uid = jobFileReader.ReadLine()
         cnfg.pwd = jobFileReader.ReadLine()
         Dim pwdIsPassword As String = jobFileReader.ReadLine()
-        Select Case pwdIsPassword
-
-            Case "1"
+        Select Case CInt(pwdIsPassword)
+            Case cmbPasswordIndex.password
                 cnfg.pwdIsPassword = True
-            Case "2"
+            Case cmbPasswordIndex.usertoken
                 cnfg.pwdIsPassword = False
             Case Else
                 cnfg.pwdIsPassword = False
@@ -247,10 +311,10 @@ Public Class frmETL
         txtPassword.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex <> 0
         txtServer.Visible = txtPassword.Visible And txtPassword.Text.Length > 0
         lblServer.Visible = txtServer.Visible
-        lblAppToken.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex = 1
+        lblAppToken.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex = cmbPasswordIndex.password
         btnAppToken.Visible = lblAppToken.Visible
         txtAppToken.Visible = lblAppToken.Visible
-        btnUserToken.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex = 2
+        btnUserToken.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex = cmbPasswordIndex.usertoken
         btnListFields.Visible = False
         btnDestination.Visible = True
         btnImport.Visible = False
@@ -436,13 +500,11 @@ Public Class frmETL
             If keyfid = "3" And fieldNode.fid = "3" And Not automode Then
                 Dim copyAnyway As MsgBoxResult = Alert("Copying into the key field " & fieldNode.label & " will update existing records without creating New records. Do you want To Continue?", MsgBoxStyle.YesNo)
                 If copyAnyway = MsgBoxResult.No Then
-                    VolatileWrite(copyFinished, True)
                     Return False
                 End If
             End If
             If fidsForImport.Contains(fieldNode.fid) And Not automode Then
                 Alert("You cannot import two different columns into the same field: " & destComboBoxCell.Value, MsgBoxStyle.OkOnly, AppName)
-                VolatileWrite(copyFinished, True)
                 Return False
             End If
             fidsForImport.Add(fieldNode.fid)
@@ -451,7 +513,6 @@ Public Class frmETL
         Next
         If fidsForImport.Count = 0 And Not automode Then
             Alert("You must map at least one field from the source table to the destination table.", MsgBoxStyle.OkOnly, AppName)
-            VolatileWrite(copyFinished, True)
             Return False
         End If
         Return executeUpload(cnctStrings, lblDestinationTable.Text, destinationFields, sourceFieldOrdinals, strSourceSQL)
@@ -464,7 +525,10 @@ Public Class frmETL
             For Each var In destinationFields
                 strDestinationSQL &= "?,"
             Next
-            strDestinationSQL = strDestinationSQL.Substring(0, strDestinationSQL.Length - 1) & ")"
+            If strDestinationSQL.Length > 0 Then
+                strDestinationSQL = strDestinationSQL.Substring(0, strDestinationSQL.Length - 1)
+            End If
+            strDestinationSQL &= ")"
             Using command As OdbcCommand = New OdbcCommand(strDestinationSQL, quNectConn)
                 For Each field In destinationFields
                     Dim qdbType As OdbcType
@@ -477,8 +541,11 @@ Public Class frmETL
                 command.Transaction = transaction
                 command.CommandType = CommandType.Text
                 command.CommandTimeout = 0
-                Dim progressThread As System.Threading.Thread = New Threading.Thread(AddressOf showProgress)
-                progressThread.Start()
+                If Not automode Then
+                    Dim progressThread As System.Threading.Thread = New Threading.Thread(AddressOf showProgress)
+                    Volatile.Write(progressMessage, "Initializing...")
+                    progressThread.Start()
+                End If
                 'we have to open up a reader on the source
                 Dim srcConnection As OdbcConnection
                 srcConnection = New OdbcConnection(cnctStrings.src)
@@ -493,6 +560,9 @@ Public Class frmETL
                         Dim rowCount As Integer = 0
                         While (dr.Read())
                             fileLineCounter += 1
+                            If Not automode Then
+                                Volatile.Write(progressMessage, "Queuing up record " & fileLineCounter)
+                            End If
                             For i As Integer = 0 To sourceFieldOrdinals.Count - 1
                                 If setODBCParameter(dr.GetValue(sourceFieldOrdinals(i)), destinationFields(i).fid, command, fileLineCounter, conversionErrors) Then
                                     Exit While
@@ -500,10 +570,14 @@ Public Class frmETL
                             Next
                             rowCount = command.ExecuteNonQuery()
                         End While
+                        If Not automode Then
+                            Volatile.Write(progressMessage, "Committing " & fileLineCounter & " records")
+                        End If
                         transaction.Commit()
                         If Not automode Then
-                            Alert(rowCount & " rows were uploaded to Quickbase.")
+                            Volatile.Write(progressMessage, "Committed " & fileLineCounter & " records")
                         End If
+                        Alert(fileLineCounter & " rows were uploaded to Quickbase.")
                     Catch excpt As Exception
                         srcCmd.Cancel()
                         srcCmd.Dispose()
@@ -516,32 +590,50 @@ Public Class frmETL
             End Using
 
         Catch ex As Exception
+            If Not automode Then
+                Volatile.Write(progressMessage, "")
+            End If
             Alert("Could Not copy because " & ex.Message)
         End Try
-        VolatileWrite(copyFinished, True)
+        If Not automode Then
+            Volatile.Write(progressMessage, "")
+        End If
         Return True
 
     End Function
     Function Alert(msg As String) As MsgBoxResult
         If automode Then
-            Throw New System.Exception(msg)
+            If cmdLineArgs.Length > arg.logFile Then
+                logFile.WriteLine(msg)
+                logFile.Flush()
+
+            End If
         Else
             Return MsgBox(msg)
         End If
+        Return MsgBoxResult.Ok
     End Function
     Function Alert(msg As String, style As MsgBoxStyle) As MsgBoxResult
         If automode Then
-            Throw New System.Exception(msg)
+            If cmdLineArgs.Length > arg.logFile Then
+                logFile.WriteLine(msg)
+                logFile.Flush()
+            End If
         Else
             Return MsgBox(msg, style)
         End If
+        Return MsgBoxResult.Ok
     End Function
     Function Alert(msg As String, style As MsgBoxStyle, title As String) As MsgBoxResult
         If automode Then
-            Throw New System.Exception(msg)
+            If cmdLineArgs.Length > arg.logFile Then
+                logFile.WriteLine(msg)
+                logFile.Flush()
+            End If
         Else
             Return MsgBox(msg, style, title)
         End If
+        Return MsgBoxResult.Ok
     End Function
     Private Function getquNectConn(connectionString As String) As OdbcConnection
         If qdbConnections.ContainsKey(connectionString) Then
@@ -597,29 +689,7 @@ Public Class frmETL
             Alert("Could not list tables because " & ex.Message)
         End Try
     End Sub
-    Sub listCatalogs()
-        Try
-            Dim connectionString As String = getConnectionString(False)
-            Dim quNectConn As OdbcConnection = getquNectConn(connectionString)
-            Using quNectCmd = New OdbcCommand("SELECT * FROM CATALOGS", quNectConn)
-                Dim dr As OdbcDataReader = quNectCmd.ExecuteReader()
-                frmTableChooser.tvAppsTables.BeginUpdate()
-                frmTableChooser.tvAppsTables.Nodes.Clear()
-                While (dr.Read())
-                    Dim applicationName As String = dr.GetString(0)
-                    Dim appDBID As String = dr.GetString(4)
-                    Dim appNode As TreeNode = frmTableChooser.tvAppsTables.Nodes.Add(applicationName)
-                    appNode.Tag = appDBID
-                End While
-                frmTableChooser.Text = "Choose an Application"
-                frmTableChooser.tvAppsTables.EndUpdate()
-            End Using
-        Catch ex As Exception
-            Alert("Could not list catalogs because " & ex.Message)
-            Exit Sub
-        End Try
-        frmTableChooser.Show()
-    End Sub
+
     Sub listTablesFromGetSchema(tables As DataTable)
         frmTableChooser.tvAppsTables.BeginUpdate()
         frmTableChooser.tvAppsTables.Nodes.Clear()
@@ -628,15 +698,12 @@ Public Class frmETL
         Dim applicationName As String = ""
         Dim prevAppName As String = ""
         Dim dbid As String
-        pb.Minimum = 0
-        pb.Value = 0
-        pb.Visible = True
-        pb.Maximum = tables.Rows.Count
+
         Dim getDBIDfromdbName As New Regex("([a-z0-9~]+)$")
 
 
         For i = 0 To tables.Rows.Count - 1
-            pb.Value = i
+
             Application.DoEvents()
             dbName = tables.Rows(i)(2)
             applicationName = tables.Rows(i)(0)
@@ -663,7 +730,7 @@ Public Class frmETL
         Next
         frmTableChooser.Text = "Choose a Table"
         frmTableChooser.tvAppsTables.EndUpdate()
-        pb.Value = 0
+
         btnImport.Visible = True
         lblDestinationTable.Visible = True
         frmTableChooser.Show()
@@ -780,8 +847,6 @@ Public Class frmETL
         import()
     End Sub
     Sub import()
-        VolatileWrite(copyFinished, False)
-        pb.Visible = True
         Dim cnctStrings As connectionStrings
         cnctStrings.src = "DSN=" & cmbDSN.Text & ";"
         cnctStrings.dst = getConnectionString(True)
@@ -813,25 +878,13 @@ Public Class frmETL
 
     Private Sub showProgress()
         Try
-            Dim quNectConn As OdbcConnection = New OdbcConnection(getConnectionString(True))
-            quNectConn.Open()
-            Dim pbValue As Integer
-            While Not VolatileRead(copyFinished)
-                Dim currentCount = countRecords("SELECT count(1) FROM """ & lblDestinationTable.Text & """ WHERE fid4 = '" & txtUsername.Text & "'", quNectConn)
-                Debug.WriteLine(Now & currentCount.ToString)
-                If currentCount > copyCount + existingCount Then
-                    pbValue = copyCount + existingCount
-                ElseIf currentCount < existingCount Then
-                    pbValue = existingCount
-                Else
-                    pbValue = currentCount
-                End If
-                SetLabelProgress("Copying record " & (pbValue - existingCount) & " of " & copyCount)
-                SetPBProgress(pbValue)
+            Dim msg As String = " "
+            While msg.Length > 0
+                msg = Volatile.Read(progressMessage)
+                SetLabelProgress(msg)
                 Threading.Thread.Sleep(2000)
             End While
             SetLabelProgress("")
-            SetPBProgress(copyCount + existingCount)
         Catch ex As Exception
             'Alert(ex.Message)
         End Try
@@ -842,7 +895,7 @@ Public Class frmETL
         ' InvokeRequired required compares the thread ID of the  
         ' calling thread to the thread ID of the creating thread.  
         ' If these threads are different, it returns true.  
-        If Me.lblProgress.InvokeRequired Or Me.pb.InvokeRequired Then
+        If Me.lblProgress.InvokeRequired Then
             Dim d As New LabelDelegate(AddressOf SetLabelProgress)
             Me.Invoke(d, New Object() {progressMessage})
         Else
@@ -850,36 +903,11 @@ Public Class frmETL
         End If
     End Sub
     Delegate Sub PBDelegate(numRecords As Integer)
-    Private Sub SetPBProgress(ByVal numRecords As Integer)
-
-        ' InvokeRequired required compares the thread ID of the  
-        ' calling thread to the thread ID of the creating thread.  
-        ' If these threads are different, it returns true.  
-        If Me.pb.InvokeRequired Then
-            Dim d As New PBDelegate(AddressOf SetPBProgress)
-            Me.Invoke(d, New Object() {numRecords})
-        Else
-            Me.pb.Maximum = existingCount + copyCount
-            Me.pb.Minimum = existingCount
-            Me.pb.Value = numRecords
-        End If
-    End Sub
-
-
     Private Sub frmETL_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         SaveSetting(AppName, "config", "SQL", strSourceSQL)
-        VolatileWrite(copyFinished, True)
     End Sub
 
-    Function VolatileRead(Of T)(ByRef Address As T) As T
-        VolatileRead = Address
-        Threading.Thread.MemoryBarrier()
-    End Function
 
-    Sub VolatileWrite(Of T)(ByRef Address As T, ByVal Value As T)
-        Threading.Thread.MemoryBarrier()
-        Address = Value
-    End Sub
 
     Private Sub cmbPassword_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbPassword.SelectedIndexChanged
         SaveSetting(AppName, "Credentials", "passwordOrToken", cmbPassword.SelectedIndex)
@@ -927,10 +955,6 @@ Public Class frmETL
         frmSQL.Show()
         Me.Cursor = Cursors.Default
     End Sub
-
-
-
-
 End Class
 
 
