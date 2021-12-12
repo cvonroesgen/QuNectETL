@@ -27,9 +27,9 @@
     <InstallUrl>https://www.qunect.com/download/QuNectETL/</InstallUrl>
     <SupportUrl>http://www.qunect.com</SupportUrl>
     <ErrorReportUrl>http://www.qunect.com</ErrorReportUrl>
-    <ProductName>QuNect Copy</ProductName>
+    <ProductName>QuNect ETL</ProductName>
     <PublisherName>QuNect</PublisherName>
-    <ApplicationRevision>16</ApplicationRevision>
+    <ApplicationRevision>17</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
