@@ -86,6 +86,7 @@ Public Class frmETL
     Private Const fieldDelimiter = "|"
     Private Const fieldTypeDelimiter = ":"
     Private Const ordinalDelimter = "."
+    Private Const truncateSQL = 100
     Public Shared strSourceSQL As String = ""
     Private Title = "QuNect ETL"
     Private destinationFieldNodes As New Dictionary(Of String, qdbField)
@@ -175,8 +176,15 @@ Public Class frmETL
         Else
             ckbDetectProxy.Checked = False
         End If
-        lblSQL.Text = strSourceSQL
+        displaySQL()
         showHideControls()
+    End Sub
+    Sub displaySQL()
+        If strSourceSQL.Length > truncateSQL Then
+            lblSQL.Text = strSourceSQL.Substring(0, truncateSQL)
+        Else
+            lblSQL.Text = strSourceSQL
+        End If
     End Sub
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         saveDialog.Filter = "JOB Files (*.job)|*.job"
@@ -255,7 +263,7 @@ Public Class frmETL
         Dim sourceFieldOrdinals As String = cnfg.sourceFieldOrdinals
         Dim fidsForImport As String = cnfg.fidsForImport
         strSourceSQL = cnfg.srcSQL
-        lblSQL.Text = strSourceSQL
+        displaySQL()
         listFields(lblDestinationTable.Text, strSourceSQL)
         Dim fidsToLabels As Dictionary(Of String, String) = listFields(lblDestinationTable.Text, strSourceSQL)
         Dim srcOrdinals As String() = sourceFieldOrdinals.Split(ordinalDelimter)
