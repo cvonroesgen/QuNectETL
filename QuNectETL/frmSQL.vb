@@ -10,12 +10,12 @@
 
     Private Sub txtSQL_TextChanged(sender As Object, e As EventArgs) Handles txtSQL.TextChanged
         frmETL.strSourceSQL = txtSQL.Text
-        frmETL.lblSQL.Text = txtSQL.Text
+        frmETL.displaySQL()
     End Sub
 
     Private Sub btnSQLDone_Click(sender As Object, e As EventArgs) Handles btnSQLDone.Click
         frmETL.strSourceSQL = txtSQL.Text
-        frmETL.lblSQL.Text = txtSQL.Text
+        frmETL.displaySQL()
         Me.Close()
     End Sub
 End Class

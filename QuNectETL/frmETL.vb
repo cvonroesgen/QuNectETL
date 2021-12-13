@@ -179,11 +179,11 @@ Public Class frmETL
         displaySQL()
         showHideControls()
     End Sub
-    Sub displaySQL()
+    Public Shared Sub displaySQL()
         If strSourceSQL.Length > truncateSQL Then
-            lblSQL.Text = strSourceSQL.Substring(0, truncateSQL)
+            frmETL.lblSQL.Text = strSourceSQL.Substring(0, truncateSQL).Replace(vbCrLf, " ")
         Else
-            lblSQL.Text = strSourceSQL
+            frmETL.lblSQL.Text = strSourceSQL
         End If
     End Sub
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
