@@ -535,8 +535,8 @@ Public Class frmETL
             Me.Cursor = Cursors.Default
             Return False
         End If
-        Return executeUpload(cnctStrings, lblDestinationTable.Text, destinationFields, sourceFieldOrdinals, strSourceSQL)
         Me.Cursor = Cursors.Default
+        Return executeUpload(cnctStrings, lblDestinationTable.Text, destinationFields, sourceFieldOrdinals, strSourceSQL)
     End Function
     Private Function executeUpload(cnctStrings As connectionStrings, DBID As String, destinationFields As ArrayList, sourceFieldOrdinals As ArrayList, strSourceSQL As String) As Boolean
         Try
