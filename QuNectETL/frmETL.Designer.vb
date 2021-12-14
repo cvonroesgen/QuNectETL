@@ -206,7 +206,7 @@ Partial Class frmETL
         Me.ckbDetectProxy.Location = New System.Drawing.Point(429, 86)
         Me.ckbDetectProxy.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.ckbDetectProxy.Name = "ckbDetectProxy"
-        Me.ckbDetectProxy.Size = New System.Drawing.Size(279, 24)
+        Me.ckbDetectProxy.Size = New System.Drawing.Size(272, 24)
         Me.ckbDetectProxy.TabIndex = 36
         Me.ckbDetectProxy.Text = "Automatically detect proxy settings"
         Me.ckbDetectProxy.UseVisualStyleBackColor = True
@@ -292,9 +292,10 @@ Partial Class frmETL
         '
         'lblSQL
         '
+        Me.lblSQL.AutoEllipsis = True
         Me.lblSQL.AutoSize = True
-        Me.lblSQL.Location = New System.Drawing.Point(278, 245)
-        Me.lblSQL.MaximumSize = New System.Drawing.Size(0, 200)
+        Me.lblSQL.Location = New System.Drawing.Point(275, 239)
+        Me.lblSQL.MaximumSize = New System.Drawing.Size(525, 20)
         Me.lblSQL.Name = "lblSQL"
         Me.lblSQL.Size = New System.Drawing.Size(0, 20)
         Me.lblSQL.TabIndex = 84

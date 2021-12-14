@@ -37,8 +37,10 @@ Partial Class frmSQL
         Me.txtSQL.MaxLength = 65536
         Me.txtSQL.Multiline = True
         Me.txtSQL.Name = "txtSQL"
+        Me.txtSQL.ScrollBars = System.Windows.Forms.ScrollBars.Both
         Me.txtSQL.Size = New System.Drawing.Size(716, 428)
         Me.txtSQL.TabIndex = 0
+        Me.txtSQL.WordWrap = False
         '
         'lblEnterSQL
         '

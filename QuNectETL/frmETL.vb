@@ -115,6 +115,8 @@ Public Class frmETL
     End Enum
     Private logFile As StreamWriter
     Private Sub restore_Load(sender As Object, e As EventArgs) Handles Me.Load
+
+
         dgMapping.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         cmdLineArgs = System.Environment.GetCommandLineArgs()
         If cmdLineArgs.Length > arg.configFile Then
@@ -156,6 +158,7 @@ Public Class frmETL
         Else
             automode = False
         End If
+        Me.Cursor = Cursors.WaitCursor
         Dim myBuildInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
         Title &= " " & myBuildInfo.ProductVersion
         Text = Title
@@ -178,6 +181,7 @@ Public Class frmETL
         End If
         displaySQL()
         showHideControls()
+        Me.Cursor = Cursors.Default
     End Sub
     Public Shared Sub displaySQL()
         If strSourceSQL.Length > truncateSQL Then
@@ -187,6 +191,7 @@ Public Class frmETL
         End If
     End Sub
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
+        Me.Cursor = Cursors.WaitCursor
         saveDialog.Filter = "JOB Files (*.job)|*.job"
         If saveDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim strJob As String = txtUsername.Text
@@ -218,7 +223,7 @@ Public Class frmETL
                         Exit For
                     End If
                 End If
-                If fidsForImport.Contains(fieldNode.fid) Then
+                If fidsForImport.Contains("fid" & fieldNode.fid & ":") Then
                     Alert("You cannot import two different columns into the same field: " & destComboBoxCell.Value, MsgBoxStyle.OkOnly, AppName)
                     Exit For
                 End If
@@ -237,13 +242,16 @@ Public Class frmETL
             strJob &= vbCrLf & strSourceSQL
             My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False)
         End If
+        Me.Cursor = Cursors.Default
     End Sub
     Private Sub btnLoad_Click(sender As Object, e As EventArgs) Handles btnLoad.Click
+        Me.Cursor = Cursors.WaitCursor
         Try
             loadConfig("")
         Catch excpt As Exception
             Alert("Could Not load job. " & excpt.Message)
         End Try
+        Me.Cursor = Cursors.Default
     End Sub
     Sub loadConfig(filename As String)
         Dim cnfg As New config
@@ -311,7 +319,7 @@ Public Class frmETL
         jobFileReader.ReadLine()
         cnfg.srcSQL = ""
         While Not jobFileReader.EndOfStream
-            cnfg.srcSQL &= jobFileReader.ReadLine()
+            cnfg.srcSQL &= jobFileReader.ReadLine() & vbCrLf
         End While
         jobFileReader.Close()
     End Sub
@@ -509,11 +517,13 @@ Public Class frmETL
             If keyfid = "3" And fieldNode.fid = "3" And Not automode Then
                 Dim copyAnyway As MsgBoxResult = Alert("Copying into the key field " & fieldNode.label & " will update existing records without creating New records. Do you want To Continue?", MsgBoxStyle.YesNo)
                 If copyAnyway = MsgBoxResult.No Then
+                    Me.Cursor = Cursors.Default
                     Return False
                 End If
             End If
             If fidsForImport.Contains(fieldNode.fid) And Not automode Then
                 Alert("You cannot import two different columns into the same field: " & destComboBoxCell.Value, MsgBoxStyle.OkOnly, AppName)
+                Me.Cursor = Cursors.Default
                 Return False
             End If
             fidsForImport.Add(fieldNode.fid)
@@ -522,9 +532,11 @@ Public Class frmETL
         Next
         If fidsForImport.Count = 0 And Not automode Then
             Alert("You must map at least one field from the source table to the destination table.", MsgBoxStyle.OkOnly, AppName)
+            Me.Cursor = Cursors.Default
             Return False
         End If
         Return executeUpload(cnctStrings, lblDestinationTable.Text, destinationFields, sourceFieldOrdinals, strSourceSQL)
+        Me.Cursor = Cursors.Default
     End Function
     Private Function executeUpload(cnctStrings As connectionStrings, DBID As String, destinationFields As ArrayList, sourceFieldOrdinals As ArrayList, strSourceSQL As String) As Boolean
         Try
@@ -856,6 +868,7 @@ Public Class frmETL
         import()
     End Sub
     Sub import()
+        Me.Cursor = Cursors.WaitCursor
         Dim cnctStrings As connectionStrings
         cnctStrings.src = "DSN=" & cmbDSN.Text & ";"
         cnctStrings.dst = getConnectionString(True)
