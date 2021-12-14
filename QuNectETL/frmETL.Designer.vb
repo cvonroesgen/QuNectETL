@@ -53,6 +53,8 @@ Partial Class frmETL
         Me.saveDialog = New System.Windows.Forms.SaveFileDialog()
         Me.btnLoad = New System.Windows.Forms.Button()
         Me.openFile = New System.Windows.Forms.OpenFileDialog()
+        Me.lblDSNpwd = New System.Windows.Forms.Label()
+        Me.txtDSNpwd = New System.Windows.Forms.TextBox()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -287,7 +289,7 @@ Partial Class frmETL
         Me.cmbDSN.Location = New System.Drawing.Point(18, 192)
         Me.cmbDSN.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbDSN.Name = "cmbDSN"
-        Me.cmbDSN.Size = New System.Drawing.Size(781, 28)
+        Me.cmbDSN.Size = New System.Drawing.Size(385, 28)
         Me.cmbDSN.TabIndex = 82
         '
         'lblSQL
@@ -322,11 +324,29 @@ Partial Class frmETL
         '
         Me.openFile.Filter = "QuNect ETL files|*.job"
         '
+        'lblDSNpwd
+        '
+        Me.lblDSNpwd.AutoSize = True
+        Me.lblDSNpwd.Location = New System.Drawing.Point(433, 167)
+        Me.lblDSNpwd.Name = "lblDSNpwd"
+        Me.lblDSNpwd.Size = New System.Drawing.Size(186, 20)
+        Me.lblDSNpwd.TabIndex = 87
+        Me.lblDSNpwd.Text = "DSN Password (optional)"
+        '
+        'txtDSNpwd
+        '
+        Me.txtDSNpwd.Location = New System.Drawing.Point(429, 193)
+        Me.txtDSNpwd.Name = "txtDSNpwd"
+        Me.txtDSNpwd.Size = New System.Drawing.Size(370, 26)
+        Me.txtDSNpwd.TabIndex = 88
+        '
         'frmETL
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(818, 1077)
+        Me.Controls.Add(Me.txtDSNpwd)
+        Me.Controls.Add(Me.lblDSNpwd)
         Me.Controls.Add(Me.btnLoad)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.lblSQL)
@@ -386,4 +406,6 @@ Partial Class frmETL
     Friend WithEvents saveDialog As SaveFileDialog
     Friend WithEvents btnLoad As Button
     Friend WithEvents openFile As OpenFileDialog
+    Friend WithEvents lblDSNpwd As Label
+    Friend WithEvents txtDSNpwd As TextBox
 End Class

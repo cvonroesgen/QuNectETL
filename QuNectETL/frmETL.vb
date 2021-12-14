@@ -30,6 +30,7 @@ Public Class frmETL
         Public dbid As String
         Public sourceFieldOrdinals As String
         Public fidsForImport As String
+        Public dsnPwd As String
         Public srcSQL As String
         Overrides Function toString() As String
             Return _
@@ -115,8 +116,6 @@ Public Class frmETL
     End Enum
     Private logFile As StreamWriter
     Private Sub restore_Load(sender As Object, e As EventArgs) Handles Me.Load
-
-
         dgMapping.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         cmdLineArgs = System.Environment.GetCommandLineArgs()
         If cmdLineArgs.Length > arg.configFile Then
@@ -134,7 +133,7 @@ Public Class frmETL
                 loadConfig(cmdLineArgs(arg.configFile), cnfg)
                 strSourceSQL = cnfg.srcSQL
                 Dim cnctStrings As connectionStrings
-                cnctStrings.src = "DSN=" & cnfg.DSN & ";"
+                cnctStrings.src = getSourceConnectionString(cnfg.DSN)
                 cnctStrings.dst = getQDBConnectionString(True, cnfg.uid, cnfg.pwd, cnfg.server, cnfg.apptoken, cnfg.pwdIsPassword)
                 Dim fidsForImport = New ArrayList(cnfg.fidsForImport.Split(fieldDelimiter))
                 Dim fieldNodes As New ArrayList
@@ -183,6 +182,12 @@ Public Class frmETL
         showHideControls()
         Me.Cursor = Cursors.Default
     End Sub
+    Function getSourceConnectionString(DSN As String) As String
+        getSourceConnectionString = "DSN=" & DSN & ";"
+        If txtDSNpwd.Text.Length > 0 Then
+            getSourceConnectionString &= "PWD=" & txtDSNpwd.Text & ";"
+        End If
+    End Function
     Public Shared Sub displaySQL()
         If strSourceSQL.Length > truncateSQL Then
             frmETL.lblSQL.Text = strSourceSQL.Substring(0, truncateSQL).Replace(vbCrLf, " ")
@@ -238,6 +243,7 @@ Public Class frmETL
             End If
             strJob &= vbCrLf & sourceFieldOrdinals
             strJob &= vbCrLf & fidsForImport
+            strJob &= vbCrLf & txtDSNpwd.Text
             strJob &= vbCrLf
             strJob &= vbCrLf & strSourceSQL
             My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False)
@@ -271,6 +277,7 @@ Public Class frmETL
         Dim sourceFieldOrdinals As String = cnfg.sourceFieldOrdinals
         Dim fidsForImport As String = cnfg.fidsForImport
         strSourceSQL = cnfg.srcSQL
+        txtDSNpwd.Text = cnfg.dsnPwd
         displaySQL()
         listFields(lblDestinationTable.Text, strSourceSQL)
         Dim fidsToLabels As Dictionary(Of String, String) = listFields(lblDestinationTable.Text, strSourceSQL)
@@ -316,6 +323,7 @@ Public Class frmETL
         cnfg.DSN = jobFileReader.ReadLine()
         cnfg.sourceFieldOrdinals = jobFileReader.ReadLine()
         cnfg.fidsForImport = jobFileReader.ReadLine()
+        cnfg.dsnPwd = jobFileReader.ReadLine()
         jobFileReader.ReadLine()
         cnfg.srcSQL = ""
         While Not jobFileReader.EndOfStream
@@ -811,7 +819,7 @@ Public Class frmETL
         Try
             'here we need to open the source and get the field names
             Dim srcConnection As OdbcConnection
-            srcConnection = New OdbcConnection("DSN=" & cmbDSN.Text & ";")
+            srcConnection = New OdbcConnection(getSourceConnectionString(cmbDSN.Text))
             srcConnection.Open()
 
             sourceFieldNames.Clear()
@@ -870,7 +878,7 @@ Public Class frmETL
     Sub import()
         Me.Cursor = Cursors.WaitCursor
         Dim cnctStrings As connectionStrings
-        cnctStrings.src = "DSN=" & cmbDSN.Text & ";"
+        cnctStrings.src = getSourceConnectionString(cmbDSN.Text)
         cnctStrings.dst = getConnectionString(True)
         Dim copyThread As System.Threading.Thread = New Threading.Thread(AddressOf uploadToQuickbase)
         copyThread.Start(cnctStrings)
