@@ -30,7 +30,9 @@ Public Class frmETL
         Public dbid As String
         Public sourceFieldOrdinals As String
         Public fidsForImport As String
+        Public dsnUID As String
         Public dsnPwd As String
+
         Public srcSQL As String
         Overrides Function toString() As String
             Return _
@@ -162,6 +164,8 @@ Public Class frmETL
         Title &= " " & myBuildInfo.ProductVersion
         Text = Title
         txtUsername.Text = GetSetting(AppName, "Credentials", "username")
+        txtDSNUsername.Text = GetSetting(AppName, "Credentials", "DSNUID", "")
+        txtDSNpwd.Text = GetSetting(AppName, "Credentials", "DSNPWD", "")
         cmbPassword.SelectedIndex = CInt(GetSetting(AppName, "Credentials", "passwordOrToken", "0"))
         txtPassword.Text = GetSetting(AppName, "Credentials", "password")
         txtServer.Text = GetSetting(AppName, "Credentials", "server", "")
@@ -185,7 +189,7 @@ Public Class frmETL
     Function getSourceConnectionString(DSN As String) As String
         getSourceConnectionString = "DSN=" & DSN & ";"
         If txtDSNpwd.Text.Length > 0 Then
-            getSourceConnectionString &= "PWD=" & txtDSNpwd.Text & ";"
+            getSourceConnectionString &= "UID=" & txtDSNUsername.Text & ";PWD=" & txtDSNpwd.Text & ";"
         End If
     End Function
     Public Shared Sub displaySQL()
@@ -243,6 +247,7 @@ Public Class frmETL
             End If
             strJob &= vbCrLf & sourceFieldOrdinals
             strJob &= vbCrLf & fidsForImport
+            strJob &= vbCrLf & txtDSNUsername.Text
             strJob &= vbCrLf & txtDSNpwd.Text
             strJob &= vbCrLf
             strJob &= vbCrLf & strSourceSQL
@@ -278,6 +283,7 @@ Public Class frmETL
         Dim fidsForImport As String = cnfg.fidsForImport
         strSourceSQL = cnfg.srcSQL
         txtDSNpwd.Text = cnfg.dsnPwd
+        txtDSNUsername.Text = cnfg.dsnUID
         displaySQL()
         listFields(lblDestinationTable.Text, strSourceSQL)
         Dim fidsToLabels As Dictionary(Of String, String) = listFields(lblDestinationTable.Text, strSourceSQL)
@@ -323,6 +329,7 @@ Public Class frmETL
         cnfg.DSN = jobFileReader.ReadLine()
         cnfg.sourceFieldOrdinals = jobFileReader.ReadLine()
         cnfg.fidsForImport = jobFileReader.ReadLine()
+        cnfg.dsnUID = jobFileReader.ReadLine()
         cnfg.dsnPwd = jobFileReader.ReadLine()
         jobFileReader.ReadLine()
         cnfg.srcSQL = ""
@@ -984,6 +991,14 @@ Public Class frmETL
         Me.Cursor = Cursors.WaitCursor
         frmSQL.Show()
         Me.Cursor = Cursors.Default
+    End Sub
+
+    Private Sub txtDSNUsername_TextChanged(sender As Object, e As EventArgs) Handles txtDSNUsername.TextChanged
+        SaveSetting(AppName, "Credentials", "DSNUID", txtDSNUsername.Text)
+    End Sub
+
+    Private Sub txtDSNpwd_TextChanged(sender As Object, e As EventArgs) Handles txtDSNpwd.TextChanged
+        SaveSetting(AppName, "Credentials", "DSNPWD", txtDSNpwd.Text)
     End Sub
 End Class
 

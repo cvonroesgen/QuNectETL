@@ -55,6 +55,8 @@ Partial Class frmETL
         Me.openFile = New System.Windows.Forms.OpenFileDialog()
         Me.lblDSNpwd = New System.Windows.Forms.Label()
         Me.txtDSNpwd = New System.Windows.Forms.TextBox()
+        Me.txtDSNUsername = New System.Windows.Forms.TextBox()
+        Me.lblDSNUsername = New System.Windows.Forms.Label()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -268,7 +270,7 @@ Partial Class frmETL
         Me.btnSQLStatement.Location = New System.Drawing.Point(18, 234)
         Me.btnSQLStatement.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnSQLStatement.Name = "btnSQLStatement"
-        Me.btnSQLStatement.Size = New System.Drawing.Size(250, 43)
+        Me.btnSQLStatement.Size = New System.Drawing.Size(231, 43)
         Me.btnSQLStatement.TabIndex = 81
         Me.btnSQLStatement.Text = "Enter Source SQL Statement"
         Me.btnSQLStatement.UseVisualStyleBackColor = True
@@ -289,7 +291,7 @@ Partial Class frmETL
         Me.cmbDSN.Location = New System.Drawing.Point(18, 192)
         Me.cmbDSN.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbDSN.Name = "cmbDSN"
-        Me.cmbDSN.Size = New System.Drawing.Size(385, 28)
+        Me.cmbDSN.Size = New System.Drawing.Size(250, 28)
         Me.cmbDSN.TabIndex = 82
         '
         'lblSQL
@@ -327,7 +329,7 @@ Partial Class frmETL
         'lblDSNpwd
         '
         Me.lblDSNpwd.AutoSize = True
-        Me.lblDSNpwd.Location = New System.Drawing.Point(433, 167)
+        Me.lblDSNpwd.Location = New System.Drawing.Point(557, 170)
         Me.lblDSNpwd.Name = "lblDSNpwd"
         Me.lblDSNpwd.Size = New System.Drawing.Size(186, 20)
         Me.lblDSNpwd.TabIndex = 87
@@ -335,16 +337,35 @@ Partial Class frmETL
         '
         'txtDSNpwd
         '
-        Me.txtDSNpwd.Location = New System.Drawing.Point(429, 193)
+        Me.txtDSNpwd.Location = New System.Drawing.Point(561, 193)
         Me.txtDSNpwd.Name = "txtDSNpwd"
-        Me.txtDSNpwd.Size = New System.Drawing.Size(370, 26)
+        Me.txtDSNpwd.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
+        Me.txtDSNpwd.Size = New System.Drawing.Size(238, 26)
         Me.txtDSNpwd.TabIndex = 88
+        '
+        'txtDSNUsername
+        '
+        Me.txtDSNUsername.Location = New System.Drawing.Point(282, 193)
+        Me.txtDSNUsername.Name = "txtDSNUsername"
+        Me.txtDSNUsername.Size = New System.Drawing.Size(273, 26)
+        Me.txtDSNUsername.TabIndex = 90
+        '
+        'lblDSNUsername
+        '
+        Me.lblDSNUsername.AutoSize = True
+        Me.lblDSNUsername.Location = New System.Drawing.Point(278, 170)
+        Me.lblDSNUsername.Name = "lblDSNUsername"
+        Me.lblDSNUsername.Size = New System.Drawing.Size(191, 20)
+        Me.lblDSNUsername.TabIndex = 89
+        Me.lblDSNUsername.Text = "DSN Username (optional)"
         '
         'frmETL
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(818, 1077)
+        Me.Controls.Add(Me.txtDSNUsername)
+        Me.Controls.Add(Me.lblDSNUsername)
         Me.Controls.Add(Me.txtDSNpwd)
         Me.Controls.Add(Me.lblDSNpwd)
         Me.Controls.Add(Me.btnLoad)
@@ -408,4 +429,6 @@ Partial Class frmETL
     Friend WithEvents openFile As OpenFileDialog
     Friend WithEvents lblDSNpwd As Label
     Friend WithEvents txtDSNpwd As TextBox
+    Friend WithEvents txtDSNUsername As TextBox
+    Friend WithEvents lblDSNUsername As Label
 End Class
