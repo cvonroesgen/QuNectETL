@@ -57,6 +57,7 @@ Partial Class frmETL
         Me.txtDSNpwd = New System.Windows.Forms.TextBox()
         Me.txtDSNUsername = New System.Windows.Forms.TextBox()
         Me.lblDSNUsername = New System.Windows.Forms.Label()
+        Me.lblJobFile = New System.Windows.Forms.Label()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -124,10 +125,10 @@ Partial Class frmETL
         '
         'btnDestination
         '
-        Me.btnDestination.Location = New System.Drawing.Point(18, 289)
+        Me.btnDestination.Location = New System.Drawing.Point(18, 263)
         Me.btnDestination.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnDestination.Name = "btnDestination"
-        Me.btnDestination.Size = New System.Drawing.Size(250, 35)
+        Me.btnDestination.Size = New System.Drawing.Size(231, 30)
         Me.btnDestination.TabIndex = 4
         Me.btnDestination.Text = "Choose Destination Table..."
         Me.btnDestination.UseVisualStyleBackColor = True
@@ -198,7 +199,7 @@ Partial Class frmETL
         'lblDestinationTable
         '
         Me.lblDestinationTable.AutoSize = True
-        Me.lblDestinationTable.Location = New System.Drawing.Point(276, 297)
+        Me.lblDestinationTable.Location = New System.Drawing.Point(256, 268)
         Me.lblDestinationTable.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblDestinationTable.Name = "lblDestinationTable"
         Me.lblDestinationTable.Size = New System.Drawing.Size(0, 20)
@@ -267,10 +268,10 @@ Partial Class frmETL
         '
         'btnSQLStatement
         '
-        Me.btnSQLStatement.Location = New System.Drawing.Point(18, 234)
+        Me.btnSQLStatement.Location = New System.Drawing.Point(18, 230)
         Me.btnSQLStatement.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnSQLStatement.Name = "btnSQLStatement"
-        Me.btnSQLStatement.Size = New System.Drawing.Size(231, 43)
+        Me.btnSQLStatement.Size = New System.Drawing.Size(231, 30)
         Me.btnSQLStatement.TabIndex = 81
         Me.btnSQLStatement.Text = "Enter Source SQL Statement"
         Me.btnSQLStatement.UseVisualStyleBackColor = True
@@ -298,7 +299,7 @@ Partial Class frmETL
         '
         Me.lblSQL.AutoEllipsis = True
         Me.lblSQL.AutoSize = True
-        Me.lblSQL.Location = New System.Drawing.Point(275, 239)
+        Me.lblSQL.Location = New System.Drawing.Point(256, 236)
         Me.lblSQL.MaximumSize = New System.Drawing.Size(525, 20)
         Me.lblSQL.Name = "lblSQL"
         Me.lblSQL.Size = New System.Drawing.Size(0, 20)
@@ -359,11 +360,20 @@ Partial Class frmETL
         Me.lblDSNUsername.TabIndex = 89
         Me.lblDSNUsername.Text = "DSN Username (optional)"
         '
+        'lblJobFile
+        '
+        Me.lblJobFile.AutoSize = True
+        Me.lblJobFile.Location = New System.Drawing.Point(22, 305)
+        Me.lblJobFile.Name = "lblJobFile"
+        Me.lblJobFile.Size = New System.Drawing.Size(0, 20)
+        Me.lblJobFile.TabIndex = 91
+        '
         'frmETL
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(818, 1077)
+        Me.Controls.Add(Me.lblJobFile)
         Me.Controls.Add(Me.txtDSNUsername)
         Me.Controls.Add(Me.lblDSNUsername)
         Me.Controls.Add(Me.txtDSNpwd)
@@ -431,4 +441,5 @@ Partial Class frmETL
     Friend WithEvents txtDSNpwd As TextBox
     Friend WithEvents txtDSNUsername As TextBox
     Friend WithEvents lblDSNUsername As Label
+    Friend WithEvents lblJobFile As Label
 End Class

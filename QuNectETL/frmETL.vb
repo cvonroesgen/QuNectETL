@@ -32,7 +32,6 @@ Public Class frmETL
         Public fidsForImport As String
         Public dsnUID As String
         Public dsnPwd As String
-
         Public srcSQL As String
         Overrides Function toString() As String
             Return _
@@ -182,7 +181,7 @@ Public Class frmETL
         Else
             ckbDetectProxy.Checked = False
         End If
-        displaySQL()
+        displaySQL(strSourceSQL)
         showHideControls()
         Me.Cursor = Cursors.Default
     End Sub
@@ -192,7 +191,9 @@ Public Class frmETL
             getSourceConnectionString &= "UID=" & txtDSNUsername.Text & ";PWD=" & txtDSNpwd.Text & ";"
         End If
     End Function
-    Public Shared Sub displaySQL()
+    Public Shared Sub displaySQL(srcSQL As String)
+        SaveSetting(AppName, "config", "SQL", srcSQL)
+        strSourceSQL = srcSQL
         If strSourceSQL.Length > truncateSQL Then
             frmETL.lblSQL.Text = strSourceSQL.Substring(0, truncateSQL).Replace(vbCrLf, " ")
         Else
@@ -289,7 +290,7 @@ Public Class frmETL
         strSourceSQL = cnfg.srcSQL
         txtDSNpwd.Text = cnfg.dsnPwd
         txtDSNUsername.Text = cnfg.dsnUID
-        displaySQL()
+        displaySQL(strSourceSQL)
         listFields(lblDestinationTable.Text, strSourceSQL)
         Dim fidsToLabels As Dictionary(Of String, String) = listFields(lblDestinationTable.Text, strSourceSQL)
         Dim srcOrdinals As String() = sourceFieldOrdinals.Split(ordinalDelimter)
@@ -963,12 +964,7 @@ Public Class frmETL
 
     Private Sub cmbDSN_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbDSN.SelectedIndexChanged
         SaveSetting(AppName, "Connection", "DSN", cmbDSN.Text)
-        cmbDSN_TextChanged(sender, e)
     End Sub
-    Private Sub cmbDSN_TextChanged(sender As Object, e As EventArgs) Handles cmbDSN.TextChanged
-
-    End Sub
-
     Private Sub GetDSNs()
         Dim strKeyNames() As String
         Dim intKeyCount As Integer
