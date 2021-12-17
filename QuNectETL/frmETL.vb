@@ -85,7 +85,7 @@ Public Class frmETL
     End Class
     Private cmdLineArgs() As String
     Private automode As Boolean = True
-    Private Const AppName = "QuNectETL"
+    Public Const AppName = "QuNectETL"
     Private Const fieldDelimiter = "|"
     Private Const fieldTypeDelimiter = ":"
     Private Const ordinalDelimter = "."
@@ -124,6 +124,7 @@ Public Class frmETL
             automode = True
             Dim cnfg As New config
             Try
+                loadConfig(cmdLineArgs(arg.configFile), cnfg)
                 If cmdLineArgs.Length > arg.logFile Then
                     'open log file
                     logFile = New StreamWriter(File.Open(cmdLineArgs(arg.logFile), FileMode.Append))
@@ -132,7 +133,6 @@ Public Class frmETL
                     logFile.WriteLine("Running Job File: " & cmdLineArgs(arg.configFile))
                     logFile.Write(cnfg.toString())
                 End If
-                loadConfig(cmdLineArgs(arg.configFile), cnfg)
                 strSourceSQL = cnfg.srcSQL
                 Dim cnctStrings As connectionStrings
                 cnctStrings.src = getSourceConnectionString(cnfg.DSN)
@@ -199,9 +199,10 @@ Public Class frmETL
             frmETL.lblSQL.Text = strSourceSQL
         End If
     End Sub
-    Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
+    Sub saveConfig()
         Me.Cursor = Cursors.WaitCursor
         saveDialog.Filter = "JOB Files (*.job)|*.job"
+        saveDialog.FileName = lblJobFile.Text
         If saveDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim strJob As String = txtUsername.Text
             strJob &= vbCrLf & txtPassword.Text
@@ -253,7 +254,11 @@ Public Class frmETL
             strJob &= vbCrLf & strSourceSQL
             My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False)
         End If
+        lblJobFile.Text = saveDialog.FileName
         Me.Cursor = Cursors.Default
+    End Sub
+    Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
+        saveConfig()
     End Sub
     Private Sub btnLoad_Click(sender As Object, e As EventArgs) Handles btnLoad.Click
         Me.Cursor = Cursors.WaitCursor
@@ -307,6 +312,7 @@ Public Class frmETL
     Sub loadConfig(filename As String, ByRef cnfg As config)
         If Not automode AndAlso openFile.ShowDialog = Windows.Forms.DialogResult.OK Then
             filename = openFile.FileName
+            lblJobFile.Text = filename
         End If
         Dim jobFileReader As System.IO.StreamReader
         jobFileReader = My.Computer.FileSystem.OpenTextFileReader(filename)
@@ -941,11 +947,8 @@ Public Class frmETL
     End Sub
     Delegate Sub PBDelegate(numRecords As Integer)
     Private Sub frmETL_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        SaveSetting(AppName, "config", "SQL", strSourceSQL)
+
     End Sub
-
-
-
     Private Sub cmbPassword_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbPassword.SelectedIndexChanged
         SaveSetting(AppName, "Credentials", "passwordOrToken", cmbPassword.SelectedIndex)
         showHideControls()
