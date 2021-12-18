@@ -972,6 +972,10 @@ Public Class frmETL
         Dim key As Microsoft.Win32.RegistryKey
         cmbDSN.Items.Add("Please choose...")
         key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("software\odbc\odbc.ini\odbc data sources")
+        If key Is Nothing Then
+            Alert("Sorry no DSNs to choose from." & vbCrLf & "Please install QuNect ODBC for QuickBase from https://qunect.com")
+            Return
+        End If
         strKeyNames = key.GetValueNames() 'Get an array of the key names
         intKeyCount = key.ValueCount() 'Get the number of keys
         For intCount = 0 To intKeyCount - 1

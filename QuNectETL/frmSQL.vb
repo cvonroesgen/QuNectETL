@@ -8,7 +8,7 @@
         txtSQL.Text = frmETL.strSourceSQL
     End Sub
 
-    Private Sub txtSQL_TextChanged(sender As Object, e As EventArgs) Handles txtSQL.TextChanged
+    Private Sub txtSQL_TextChanged(sender As Object, e As EventArgs)
         frmETL.displaySQL(txtSQL.Text)
     End Sub
 
