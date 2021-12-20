@@ -14,6 +14,7 @@
 
     Private Sub btnSQLDone_Click(sender As Object, e As EventArgs) Handles btnSQLDone.Click
         frmETL.displaySQL(txtSQL.Text)
+        frmETL.listFields(frmETL.lblDestinationTable.Text, txtSQL.Text)
         Me.Close()
     End Sub
 End Class
