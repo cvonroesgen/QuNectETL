@@ -58,6 +58,7 @@ Partial Class frmETL
         Me.txtDSNUsername = New System.Windows.Forms.TextBox()
         Me.lblDSNUsername = New System.Windows.Forms.Label()
         Me.lblJobFile = New System.Windows.Forms.Label()
+        Me.ckbLogSQL = New System.Windows.Forms.CheckBox()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -83,8 +84,7 @@ Partial Class frmETL
         DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
         DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.dgMapping.DefaultCellStyle = DataGridViewCellStyle2
-        Me.dgMapping.Location = New System.Drawing.Point(18, 386)
-        Me.dgMapping.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.dgMapping.Location = New System.Drawing.Point(12, 251)
         Me.dgMapping.Name = "dgMapping"
         DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control
@@ -95,7 +95,7 @@ Partial Class frmETL
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
         Me.dgMapping.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.dgMapping.RowHeadersWidth = 62
-        Me.dgMapping.Size = New System.Drawing.Size(783, 676)
+        Me.dgMapping.Size = New System.Drawing.Size(522, 439)
         Me.dgMapping.TabIndex = 0
         '
         'Source
@@ -115,20 +115,18 @@ Partial Class frmETL
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(524, 335)
-        Me.btnImport.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnImport.Location = New System.Drawing.Point(349, 218)
         Me.btnImport.Name = "btnImport"
-        Me.btnImport.Size = New System.Drawing.Size(278, 42)
+        Me.btnImport.Size = New System.Drawing.Size(185, 27)
         Me.btnImport.TabIndex = 3
         Me.btnImport.Text = "Copy from Source to Destination"
         Me.btnImport.UseVisualStyleBackColor = True
         '
         'btnDestination
         '
-        Me.btnDestination.Location = New System.Drawing.Point(18, 263)
-        Me.btnDestination.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnDestination.Location = New System.Drawing.Point(12, 171)
         Me.btnDestination.Name = "btnDestination"
-        Me.btnDestination.Size = New System.Drawing.Size(231, 30)
+        Me.btnDestination.Size = New System.Drawing.Size(154, 20)
         Me.btnDestination.TabIndex = 4
         Me.btnDestination.Text = "Choose Destination Table..."
         Me.btnDestination.UseVisualStyleBackColor = True
@@ -136,92 +134,82 @@ Partial Class frmETL
         'lblAppToken
         '
         Me.lblAppToken.AutoSize = True
-        Me.lblAppToken.Location = New System.Drawing.Point(22, 98)
-        Me.lblAppToken.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblAppToken.Location = New System.Drawing.Point(15, 64)
         Me.lblAppToken.Name = "lblAppToken"
-        Me.lblAppToken.Size = New System.Drawing.Size(216, 20)
+        Me.lblAppToken.Size = New System.Drawing.Size(148, 13)
         Me.lblAppToken.TabIndex = 30
         Me.lblAppToken.Text = "QuickBase Application Token"
         '
         'txtAppToken
         '
-        Me.txtAppToken.Location = New System.Drawing.Point(18, 128)
-        Me.txtAppToken.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtAppToken.Location = New System.Drawing.Point(12, 83)
         Me.txtAppToken.Name = "txtAppToken"
-        Me.txtAppToken.Size = New System.Drawing.Size(385, 26)
+        Me.txtAppToken.Size = New System.Drawing.Size(258, 20)
         Me.txtAppToken.TabIndex = 29
         '
         'lblServer
         '
         Me.lblServer.AutoSize = True
-        Me.lblServer.Location = New System.Drawing.Point(540, 17)
-        Me.lblServer.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblServer.Location = New System.Drawing.Point(360, 11)
         Me.lblServer.Name = "lblServer"
-        Me.lblServer.Size = New System.Drawing.Size(136, 20)
+        Me.lblServer.Size = New System.Drawing.Size(93, 13)
         Me.lblServer.TabIndex = 28
         Me.lblServer.Text = "QuickBase Server"
         '
         'txtServer
         '
-        Me.txtServer.Location = New System.Drawing.Point(542, 46)
-        Me.txtServer.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtServer.Location = New System.Drawing.Point(361, 30)
         Me.txtServer.Name = "txtServer"
-        Me.txtServer.Size = New System.Drawing.Size(258, 26)
+        Me.txtServer.Size = New System.Drawing.Size(173, 20)
         Me.txtServer.TabIndex = 27
         '
         'txtPassword
         '
-        Me.txtPassword.Location = New System.Drawing.Point(282, 46)
-        Me.txtPassword.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtPassword.Location = New System.Drawing.Point(188, 30)
         Me.txtPassword.Name = "txtPassword"
         Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtPassword.Size = New System.Drawing.Size(248, 26)
+        Me.txtPassword.Size = New System.Drawing.Size(167, 20)
         Me.txtPassword.TabIndex = 25
         '
         'lblUsername
         '
         Me.lblUsername.AutoSize = True
-        Me.lblUsername.Location = New System.Drawing.Point(22, 17)
-        Me.lblUsername.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblUsername.Location = New System.Drawing.Point(15, 11)
         Me.lblUsername.Name = "lblUsername"
-        Me.lblUsername.Size = New System.Drawing.Size(164, 20)
+        Me.lblUsername.Size = New System.Drawing.Size(110, 13)
         Me.lblUsername.TabIndex = 24
         Me.lblUsername.Text = "QuickBase Username"
         '
         'txtUsername
         '
-        Me.txtUsername.Location = New System.Drawing.Point(18, 46)
-        Me.txtUsername.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtUsername.Location = New System.Drawing.Point(12, 30)
         Me.txtUsername.Name = "txtUsername"
-        Me.txtUsername.Size = New System.Drawing.Size(256, 26)
+        Me.txtUsername.Size = New System.Drawing.Size(172, 20)
         Me.txtUsername.TabIndex = 23
         '
         'lblDestinationTable
         '
         Me.lblDestinationTable.AutoSize = True
-        Me.lblDestinationTable.Location = New System.Drawing.Point(256, 268)
-        Me.lblDestinationTable.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblDestinationTable.Location = New System.Drawing.Point(171, 174)
         Me.lblDestinationTable.Name = "lblDestinationTable"
-        Me.lblDestinationTable.Size = New System.Drawing.Size(0, 20)
+        Me.lblDestinationTable.Size = New System.Drawing.Size(0, 13)
         Me.lblDestinationTable.TabIndex = 34
         '
         'ckbDetectProxy
         '
         Me.ckbDetectProxy.AutoSize = True
-        Me.ckbDetectProxy.Location = New System.Drawing.Point(429, 86)
-        Me.ckbDetectProxy.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.ckbDetectProxy.Location = New System.Drawing.Point(286, 56)
         Me.ckbDetectProxy.Name = "ckbDetectProxy"
-        Me.ckbDetectProxy.Size = New System.Drawing.Size(272, 24)
+        Me.ckbDetectProxy.Size = New System.Drawing.Size(188, 17)
         Me.ckbDetectProxy.TabIndex = 36
         Me.ckbDetectProxy.Text = "Automatically detect proxy settings"
         Me.ckbDetectProxy.UseVisualStyleBackColor = True
         '
         'btnListFields
         '
-        Me.btnListFields.Location = New System.Drawing.Point(18, 335)
-        Me.btnListFields.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnListFields.Location = New System.Drawing.Point(12, 220)
         Me.btnListFields.Name = "btnListFields"
-        Me.btnListFields.Size = New System.Drawing.Size(123, 42)
+        Me.btnListFields.Size = New System.Drawing.Size(82, 27)
         Me.btnListFields.TabIndex = 37
         Me.btnListFields.Text = "List Fields"
         Me.btnListFields.UseVisualStyleBackColor = True
@@ -229,10 +217,9 @@ Partial Class frmETL
         'lblProgress
         '
         Me.lblProgress.AutoSize = True
-        Me.lblProgress.Location = New System.Drawing.Point(438, 128)
-        Me.lblProgress.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblProgress.Location = New System.Drawing.Point(292, 83)
         Me.lblProgress.Name = "lblProgress"
-        Me.lblProgress.Size = New System.Drawing.Size(0, 20)
+        Me.lblProgress.Size = New System.Drawing.Size(0, 13)
         Me.lblProgress.TabIndex = 42
         '
         'cmbPassword
@@ -240,38 +227,34 @@ Partial Class frmETL
         Me.cmbPassword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbPassword.FormattingEnabled = True
         Me.cmbPassword.Items.AddRange(New Object() {"Please choose...", "QuickBase Password", "QuickBase User Token"})
-        Me.cmbPassword.Location = New System.Drawing.Point(282, 12)
-        Me.cmbPassword.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.cmbPassword.Location = New System.Drawing.Point(188, 8)
         Me.cmbPassword.Name = "cmbPassword"
-        Me.cmbPassword.Size = New System.Drawing.Size(212, 28)
+        Me.cmbPassword.Size = New System.Drawing.Size(143, 21)
         Me.cmbPassword.TabIndex = 46
         '
         'btnAppToken
         '
-        Me.btnAppToken.Location = New System.Drawing.Point(240, 92)
-        Me.btnAppToken.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnAppToken.Location = New System.Drawing.Point(160, 60)
         Me.btnAppToken.Name = "btnAppToken"
-        Me.btnAppToken.Size = New System.Drawing.Size(28, 31)
+        Me.btnAppToken.Size = New System.Drawing.Size(19, 20)
         Me.btnAppToken.TabIndex = 79
         Me.btnAppToken.Text = "?"
         Me.btnAppToken.UseVisualStyleBackColor = True
         '
         'btnUserToken
         '
-        Me.btnUserToken.Location = New System.Drawing.Point(502, 14)
-        Me.btnUserToken.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnUserToken.Location = New System.Drawing.Point(335, 9)
         Me.btnUserToken.Name = "btnUserToken"
-        Me.btnUserToken.Size = New System.Drawing.Size(28, 31)
+        Me.btnUserToken.Size = New System.Drawing.Size(19, 20)
         Me.btnUserToken.TabIndex = 80
         Me.btnUserToken.Text = "?"
         Me.btnUserToken.UseVisualStyleBackColor = True
         '
         'btnSQLStatement
         '
-        Me.btnSQLStatement.Location = New System.Drawing.Point(18, 230)
-        Me.btnSQLStatement.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnSQLStatement.Location = New System.Drawing.Point(12, 150)
         Me.btnSQLStatement.Name = "btnSQLStatement"
-        Me.btnSQLStatement.Size = New System.Drawing.Size(231, 30)
+        Me.btnSQLStatement.Size = New System.Drawing.Size(154, 20)
         Me.btnSQLStatement.TabIndex = 81
         Me.btnSQLStatement.Text = "Enter Source SQL Statement"
         Me.btnSQLStatement.UseVisualStyleBackColor = True
@@ -279,46 +262,47 @@ Partial Class frmETL
         'lblDSN
         '
         Me.lblDSN.AutoSize = True
-        Me.lblDSN.Location = New System.Drawing.Point(22, 165)
-        Me.lblDSN.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblDSN.Location = New System.Drawing.Point(15, 107)
         Me.lblDSN.Name = "lblDSN"
-        Me.lblDSN.Size = New System.Drawing.Size(43, 20)
+        Me.lblDSN.Size = New System.Drawing.Size(30, 13)
         Me.lblDSN.TabIndex = 83
         Me.lblDSN.Text = "DSN"
         '
         'cmbDSN
         '
         Me.cmbDSN.FormattingEnabled = True
-        Me.cmbDSN.Location = New System.Drawing.Point(18, 192)
-        Me.cmbDSN.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.cmbDSN.Location = New System.Drawing.Point(12, 125)
         Me.cmbDSN.Name = "cmbDSN"
-        Me.cmbDSN.Size = New System.Drawing.Size(250, 28)
+        Me.cmbDSN.Size = New System.Drawing.Size(168, 21)
         Me.cmbDSN.TabIndex = 82
         '
         'lblSQL
         '
         Me.lblSQL.AutoEllipsis = True
         Me.lblSQL.AutoSize = True
-        Me.lblSQL.Location = New System.Drawing.Point(256, 236)
-        Me.lblSQL.MaximumSize = New System.Drawing.Size(525, 20)
+        Me.lblSQL.Location = New System.Drawing.Point(171, 153)
+        Me.lblSQL.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblSQL.MaximumSize = New System.Drawing.Size(350, 13)
         Me.lblSQL.Name = "lblSQL"
-        Me.lblSQL.Size = New System.Drawing.Size(0, 20)
+        Me.lblSQL.Size = New System.Drawing.Size(0, 13)
         Me.lblSQL.TabIndex = 84
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(339, 337)
+        Me.btnSave.Location = New System.Drawing.Point(262, 219)
+        Me.btnSave.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(114, 42)
+        Me.btnSave.Size = New System.Drawing.Size(65, 27)
         Me.btnSave.TabIndex = 85
         Me.btnSave.Text = "Save Job"
         Me.btnSave.UseVisualStyleBackColor = True
         '
         'btnLoad
         '
-        Me.btnLoad.Location = New System.Drawing.Point(200, 337)
+        Me.btnLoad.Location = New System.Drawing.Point(116, 220)
+        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.btnLoad.Name = "btnLoad"
-        Me.btnLoad.Size = New System.Drawing.Size(118, 40)
+        Me.btnLoad.Size = New System.Drawing.Size(71, 26)
         Me.btnLoad.TabIndex = 86
         Me.btnLoad.Text = "Load Job"
         Me.btnLoad.UseVisualStyleBackColor = True
@@ -330,49 +314,65 @@ Partial Class frmETL
         'lblDSNpwd
         '
         Me.lblDSNpwd.AutoSize = True
-        Me.lblDSNpwd.Location = New System.Drawing.Point(557, 170)
+        Me.lblDSNpwd.Location = New System.Drawing.Point(371, 110)
+        Me.lblDSNpwd.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblDSNpwd.Name = "lblDSNpwd"
-        Me.lblDSNpwd.Size = New System.Drawing.Size(186, 20)
+        Me.lblDSNpwd.Size = New System.Drawing.Size(125, 13)
         Me.lblDSNpwd.TabIndex = 87
         Me.lblDSNpwd.Text = "DSN Password (optional)"
         '
         'txtDSNpwd
         '
-        Me.txtDSNpwd.Location = New System.Drawing.Point(561, 193)
+        Me.txtDSNpwd.Location = New System.Drawing.Point(374, 125)
+        Me.txtDSNpwd.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.txtDSNpwd.Name = "txtDSNpwd"
         Me.txtDSNpwd.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtDSNpwd.Size = New System.Drawing.Size(238, 26)
+        Me.txtDSNpwd.Size = New System.Drawing.Size(160, 20)
         Me.txtDSNpwd.TabIndex = 88
         '
         'txtDSNUsername
         '
-        Me.txtDSNUsername.Location = New System.Drawing.Point(282, 193)
+        Me.txtDSNUsername.Location = New System.Drawing.Point(188, 125)
+        Me.txtDSNUsername.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.txtDSNUsername.Name = "txtDSNUsername"
-        Me.txtDSNUsername.Size = New System.Drawing.Size(273, 26)
+        Me.txtDSNUsername.Size = New System.Drawing.Size(183, 20)
         Me.txtDSNUsername.TabIndex = 90
         '
         'lblDSNUsername
         '
         Me.lblDSNUsername.AutoSize = True
-        Me.lblDSNUsername.Location = New System.Drawing.Point(278, 170)
+        Me.lblDSNUsername.Location = New System.Drawing.Point(185, 110)
+        Me.lblDSNUsername.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblDSNUsername.Name = "lblDSNUsername"
-        Me.lblDSNUsername.Size = New System.Drawing.Size(191, 20)
+        Me.lblDSNUsername.Size = New System.Drawing.Size(127, 13)
         Me.lblDSNUsername.TabIndex = 89
         Me.lblDSNUsername.Text = "DSN Username (optional)"
         '
         'lblJobFile
         '
         Me.lblJobFile.AutoSize = True
-        Me.lblJobFile.Location = New System.Drawing.Point(22, 305)
+        Me.lblJobFile.Location = New System.Drawing.Point(15, 198)
+        Me.lblJobFile.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblJobFile.Name = "lblJobFile"
-        Me.lblJobFile.Size = New System.Drawing.Size(0, 20)
+        Me.lblJobFile.Size = New System.Drawing.Size(0, 13)
         Me.lblJobFile.TabIndex = 91
+        '
+        'ckbLogSQL
+        '
+        Me.ckbLogSQL.AutoSize = True
+        Me.ckbLogSQL.Location = New System.Drawing.Point(193, 224)
+        Me.ckbLogSQL.Name = "ckbLogSQL"
+        Me.ckbLogSQL.Size = New System.Drawing.Size(68, 17)
+        Me.ckbLogSQL.TabIndex = 92
+        Me.ckbLogSQL.Text = "Log SQL"
+        Me.ckbLogSQL.UseVisualStyleBackColor = True
         '
         'frmETL
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(818, 1077)
+        Me.ClientSize = New System.Drawing.Size(545, 700)
+        Me.Controls.Add(Me.ckbLogSQL)
         Me.Controls.Add(Me.lblJobFile)
         Me.Controls.Add(Me.txtDSNUsername)
         Me.Controls.Add(Me.lblDSNUsername)
@@ -402,7 +402,6 @@ Partial Class frmETL
         Me.Controls.Add(Me.btnImport)
         Me.Controls.Add(Me.dgMapping)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmETL"
         Me.Text = "QuNect ETL"
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).EndInit()
@@ -442,4 +441,5 @@ Partial Class frmETL
     Friend WithEvents txtDSNUsername As TextBox
     Friend WithEvents lblDSNUsername As Label
     Friend WithEvents lblJobFile As Label
+    Friend WithEvents ckbLogSQL As CheckBox
 End Class

@@ -33,7 +33,13 @@ Public Class frmETL
         Public dsnUID As String
         Public dsnPwd As String
         Public srcSQL As String
+        Public logSQL As Boolean
         Overrides Function toString() As String
+            Return _
+            toStringNoSQL() _
+            & "srcSQL: " & srcSQL & vbCrLf
+        End Function
+        Public Function toStringNoSQL() As String
             Return _
             "uid: " & uid & vbCrLf _
             & "pwd: " & pwd & vbCrLf _
@@ -44,8 +50,7 @@ Public Class frmETL
             & "DSN: " & DSN & vbCrLf _
             & "dbid: " & dbid & vbCrLf _
             & "sourceFieldOrdinals: " & sourceFieldOrdinals & vbCrLf _
-            & "fidsForImport: " & fidsForImport & vbCrLf _
-            & "srcSQL: " & srcSQL & vbCrLf
+            & "fidsForImport: " & fidsForImport & vbCrLf
         End Function
     End Structure
     Private Class qdbField
@@ -130,11 +135,15 @@ Public Class frmETL
                     logFile.WriteLine()
                     logFile.WriteLine(DateTime.Now)
                     logFile.WriteLine("Running Job File: " & cmdLineArgs(arg.configFile))
-                    logFile.Write(cnfg.toString())
+                    If cnfg.logSQL Then
+                        logFile.Write(cnfg.toString())
+                    Else
+                        logFile.Write(cnfg.toStringNoSQL())
+                    End If
                 End If
                 strSourceSQL = cnfg.srcSQL
                 Dim cnctStrings As connectionStrings
-                cnctStrings.src = getSourceConnectionString(cnfg.DSN)
+                cnctStrings.src = getSourceConnectionString(cnfg.DSN, cnfg)
                 cnctStrings.dst = getQDBConnectionString(True, cnfg.uid, cnfg.pwd, cnfg.server, cnfg.apptoken, cnfg.pwdIsPassword)
                 Dim fidsForImport = New ArrayList(cnfg.fidsForImport.Split(fieldDelimiter))
                 Dim fieldNodes As New ArrayList
@@ -189,6 +198,15 @@ Public Class frmETL
         getSourceConnectionString = "DSN=" & DSN & ";"
         If txtDSNpwd.Text.Length > 0 Then
             getSourceConnectionString &= "UID=" & txtDSNUsername.Text & ";PWD=" & txtDSNpwd.Text & ";"
+        End If
+    End Function
+    Function getSourceConnectionString(DSN As String, cnfg As config) As String
+        getSourceConnectionString = "DSN=" & DSN & ";"
+        If cnfg.dsnUID.Length > 0 Then
+            getSourceConnectionString &= "UID=" & cnfg.dsnUID & ";"
+        End If
+        If cnfg.dsnPwd.Length > 0 Then
+            getSourceConnectionString &= "PWD=" & cnfg.dsnPwd & ";"
         End If
     End Function
     Public Shared Sub displaySQL(srcSQL As String)
@@ -251,6 +269,11 @@ Public Class frmETL
             strJob &= vbCrLf & fidsForImport
             strJob &= vbCrLf & txtDSNUsername.Text
             strJob &= vbCrLf & txtDSNpwd.Text
+            If ckbLogSql.Checked Then
+                strJob &= vbCrLf & "1"
+            Else
+                strJob &= vbCrLf & "0"
+            End If
             strJob &= vbCrLf
             strJob &= vbCrLf & strSourceSQL
             My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False)
@@ -290,6 +313,11 @@ Public Class frmETL
         strSourceSQL = cnfg.srcSQL
         txtDSNpwd.Text = cnfg.dsnPwd
         txtDSNUsername.Text = cnfg.dsnUID
+        If cnfg.logSQL Then
+            ckbLogSQL.Checked = True
+        Else
+            ckbLogSQL.Checked = False
+        End If
         displaySQL(strSourceSQL)
         listFields(lblDestinationTable.Text, strSourceSQL)
         Dim fidsToLabels As Dictionary(Of String, String) = listFields(lblDestinationTable.Text, strSourceSQL)
@@ -311,39 +339,51 @@ Public Class frmETL
         End If
     End Sub
     Sub loadConfig(filename As String, ByRef cnfg As config)
-        If Not automode AndAlso openFile.ShowDialog = Windows.Forms.DialogResult.OK Then
-            filename = openFile.FileName
-            lblJobFile.Text = filename
-        End If
-        Dim jobFileReader As System.IO.StreamReader
-        jobFileReader = My.Computer.FileSystem.OpenTextFileReader(filename)
-        cnfg.uid = jobFileReader.ReadLine()
-        cnfg.pwd = jobFileReader.ReadLine()
-        Dim pwdIsPassword As String = jobFileReader.ReadLine()
-        Select Case CInt(pwdIsPassword)
-            Case cmbPasswordIndex.password
-                cnfg.pwdIsPassword = True
-            Case cmbPasswordIndex.usertoken
-                cnfg.pwdIsPassword = False
-            Case Else
-                cnfg.pwdIsPassword = False
-        End Select
+        Dim jobFileReader As System.IO.StreamReader = Nothing
+        Try
+            If Not automode AndAlso openFile.ShowDialog = Windows.Forms.DialogResult.OK Then
+                filename = openFile.FileName
+                lblJobFile.Text = filename
+            End If
+            jobFileReader = My.Computer.FileSystem.OpenTextFileReader(filename)
+            cnfg.uid = jobFileReader.ReadLine()
+            cnfg.pwd = jobFileReader.ReadLine()
+            Dim pwdIsPassword As String = jobFileReader.ReadLine()
+            Select Case CInt(pwdIsPassword)
+                Case cmbPasswordIndex.password
+                    cnfg.pwdIsPassword = True
+                Case cmbPasswordIndex.usertoken
+                    cnfg.pwdIsPassword = False
+                Case Else
+                    cnfg.pwdIsPassword = False
+            End Select
 
-        cnfg.server = jobFileReader.ReadLine()
-        cnfg.apptoken = jobFileReader.ReadLine()
-        cnfg.dbid = jobFileReader.ReadLine()
-        cnfg.detectProxy = CBool(jobFileReader.ReadLine())
-        cnfg.DSN = jobFileReader.ReadLine()
-        cnfg.sourceFieldOrdinals = jobFileReader.ReadLine()
-        cnfg.fidsForImport = jobFileReader.ReadLine()
-        cnfg.dsnUID = jobFileReader.ReadLine()
-        cnfg.dsnPwd = jobFileReader.ReadLine()
-        jobFileReader.ReadLine()
-        cnfg.srcSQL = ""
-        While Not jobFileReader.EndOfStream
-            cnfg.srcSQL &= jobFileReader.ReadLine() & vbCrLf
-        End While
-        jobFileReader.Close()
+            cnfg.server = jobFileReader.ReadLine()
+            cnfg.apptoken = jobFileReader.ReadLine()
+            cnfg.dbid = jobFileReader.ReadLine()
+            cnfg.detectProxy = CBool(jobFileReader.ReadLine())
+            cnfg.DSN = jobFileReader.ReadLine()
+            cnfg.sourceFieldOrdinals = jobFileReader.ReadLine()
+            cnfg.fidsForImport = jobFileReader.ReadLine()
+            cnfg.dsnUID = jobFileReader.ReadLine()
+            cnfg.dsnPwd = jobFileReader.ReadLine()
+            Dim logSQL As String = jobFileReader.ReadLine()
+            If logSQL.Length > 0 AndAlso CInt(logSQL) > 0 Then
+                cnfg.logSQL = True
+            Else
+                cnfg.logSQL = False
+            End If
+            cnfg.srcSQL = jobFileReader.ReadLine()
+            While Not jobFileReader.EndOfStream
+                cnfg.srcSQL &= jobFileReader.ReadLine() & vbCrLf
+            End While
+        Catch excpt As Exception
+            Throw New Exception("Could read job file: " & excpt.Message)
+        Finally
+            If Not jobFileReader Is Nothing Then
+                jobFileReader.Close()
+            End If
+        End Try
     End Sub
     Sub showHideControls()
         cmbPassword.Visible = txtUsername.Text.Length > 0
