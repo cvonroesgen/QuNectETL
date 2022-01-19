@@ -75,7 +75,13 @@ Public Class frmETL
             Return fid
         End Function
     End Class
-
+    Private Class uploadConfig
+        Public cnctStrings As connectionStrings
+        Public DBID As String
+        Public destinationFields As ArrayList
+        Public sourceFieldOrdinals As ArrayList
+        Public strSourceSQL As String
+    End Class
     Private Class srcField
         Public Sub New(_label As String, _type As String)
             label = _label
@@ -151,7 +157,8 @@ Public Class frmETL
                     Dim fidType As New ArrayList(CStr(field).Split(fieldTypeDelimiter))
                     fieldNodes.Add(New qdbField(fidType(0).substring(3), fidType(0), fidType(1), "", False, False, fidType(1), 0))
                 Next
-                executeUpload(cnctStrings, cnfg.dbid, fieldNodes, New ArrayList(cnfg.sourceFieldOrdinals.Split(ordinalDelimter)), strSourceSQL)
+                Dim upCnfg As uploadConfig = New uploadConfig With {.cnctStrings = cnctStrings, .DBID = cnfg.dbid, .destinationFields = fieldNodes, .sourceFieldOrdinals = New ArrayList(cnfg.sourceFieldOrdinals.Split(ordinalDelimter)), .strSourceSQL = strSourceSQL}
+                executeUpload(upCnfg)
                 If cmdLineArgs.Length > arg.logFile Then
                     logFile.WriteLine(DateTime.Now)
                     logFile.WriteLine("Finished Job")
@@ -597,16 +604,19 @@ Public Class frmETL
             Me.Cursor = Cursors.Default
             Return False
         End If
-
-        Return executeUpload(cnctStrings, lblDestinationTable.Text, destinationFields, sourceFieldOrdinals, strSourceSQL)
+        Dim copyThread As System.Threading.Thread = New Threading.Thread(AddressOf executeUpload)
+        Dim upCnfg As uploadConfig = New uploadConfig With {.cnctStrings = cnctStrings, .DBID = lblDestinationTable.Text, .destinationFields = destinationFields, .sourceFieldOrdinals = sourceFieldOrdinals, .strSourceSQL = strSourceSQL}
+        copyThread.Start(upCnfg)
+        Me.Cursor = Cursors.Default
+        Return True
     End Function
-    Private Function executeUpload(cnctStrings As connectionStrings, DBID As String, destinationFields As ArrayList, sourceFieldOrdinals As ArrayList, strSourceSQL As String) As Boolean
+    Private Function executeUpload(upCnfg As uploadConfig) As Boolean
         Try
-            Dim strDestinationSQL As String = "INSERT INTO """ & DBID & """ (fid"
-            Using quNectConn As OdbcConnection = getquNectConn(cnctStrings.dst)
+            Dim strDestinationSQL As String = "INSERT INTO """ & upCnfg.DBID & """ (fid"
+            Using quNectConn As OdbcConnection = getquNectConn(upCnfg.cnctStrings.dst)
                 Try
-                    strDestinationSQL &= String.Join(", fid", destinationFields.ToArray) & ") VALUES ("
-                    For Each var In destinationFields
+                    strDestinationSQL &= String.Join(", fid", upCnfg.destinationFields.ToArray) & ") VALUES ("
+                    For Each var In upCnfg.destinationFields
                         strDestinationSQL &= "?,"
                     Next
                     If strDestinationSQL.Length > 0 Then
@@ -614,7 +624,7 @@ Public Class frmETL
                     End If
                     strDestinationSQL &= ")"
                     Using command As OdbcCommand = New OdbcCommand(strDestinationSQL, quNectConn)
-                        For Each field In destinationFields
+                        For Each field In upCnfg.destinationFields
                             Dim qdbType As OdbcType
                             qdbType = getODBCTypeFromQuickBaseFieldNode(field)
                             command.Parameters.Add("@fid" & field.fid, qdbType)
@@ -632,18 +642,18 @@ Public Class frmETL
                         End If
                         'we have to open up a reader on the source
                         Dim srcConnection As OdbcConnection
-                        srcConnection = New OdbcConnection(cnctStrings.src)
+                        srcConnection = New OdbcConnection(upCnfg.cnctStrings.src)
 
                         srcConnection.Open()
                         Dim fileLineCounter As Integer = 0
                         Dim conversionErrors As String = ""
-                        Using srcCmd As OdbcCommand = New OdbcCommand(strSourceSQL, srcConnection)
+                        Using srcCmd As OdbcCommand = New OdbcCommand(upCnfg.strSourceSQL, srcConnection)
                             Dim dr As OdbcDataReader
                             Try
                                 dr = srcCmd.ExecuteReader()
                                 While (dr.Read())
-                                    For i As Integer = 0 To sourceFieldOrdinals.Count - 1
-                                        If setODBCParameter(dr.GetValue(sourceFieldOrdinals(i)), destinationFields(i).fid, command, conversionErrors) Then
+                                    For i As Integer = 0 To upCnfg.sourceFieldOrdinals.Count - 1
+                                        If setODBCParameter(dr.GetValue(upCnfg.sourceFieldOrdinals(i)), upCnfg.destinationFields(i).fid, command, conversionErrors) Then
                                             Exit While
                                         End If
                                     Next
@@ -665,7 +675,7 @@ Public Class frmETL
                                 srcCmd.Dispose()
                                 transaction.Rollback()
                                 srcConnection.Close()
-                                Throw New System.Exception("Could not get record " & fileLineCounter & " from " & cnctStrings.src & vbCrLf & excpt.Message)
+                                Throw New System.Exception("Could not get record " & fileLineCounter & " from " & upCnfg.cnctStrings.src & vbCrLf & excpt.Message)
                             End Try
                         End Using
                     End Using
@@ -676,7 +686,7 @@ Public Class frmETL
                 End Try
             End Using
         Catch ex As Exception
-                If Not automode Then
+            If Not automode Then
                 Volatile.Write(progressMessage, "")
             End If
             Alert("Could Not copy because " & ex.Message)
@@ -937,8 +947,8 @@ Public Class frmETL
         Dim cnctStrings As connectionStrings
         cnctStrings.src = getSourceConnectionString(cmbDSN.Text)
         cnctStrings.dst = getConnectionString(True)
-        Dim copyThread As System.Threading.Thread = New Threading.Thread(AddressOf uploadToQuickbase)
-        copyThread.Start(cnctStrings)
+        uploadToQuickbase(cnctStrings)
+
     End Sub
 
     Private Sub btnListFields_Click(sender As Object, e As EventArgs) Handles btnListFields.Click
