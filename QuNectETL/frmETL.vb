@@ -103,7 +103,6 @@ Public Class frmETL
     Public Shared strSourceSQL As String = ""
     Private Title = "QuNect ETL"
     Private destinationFieldNodes As New Dictionary(Of String, qdbField)
-    Private qdbConnections As New Dictionary(Of String, OdbcConnection)
     Private rids As HashSet(Of String)
     Private keyfid As String
     Private uniqueExistingFieldValues As Dictionary(Of String, HashSet(Of String))
@@ -498,8 +497,8 @@ Public Class frmETL
             End If
         End Using
     End Function
-    Function setODBCParameter(val As Object, fid As String, command As OdbcCommand, ByRef conversionErrors As String) As Boolean
-        Dim qdbType As OdbcType = command.Parameters("@fid" & fid).OdbcType
+    Function setODBCParameter(qdbType As OdbcType, val As Object, fid As String, command As OdbcCommand, ByRef conversionErrors As String) As Boolean
+
         If IsDBNull(val) Then
             command.Parameters("@fid" & fid).Value = val
             Return False
@@ -623,18 +622,19 @@ Public Class frmETL
                         strDestinationSQL = strDestinationSQL.Substring(0, strDestinationSQL.Length - 1)
                     End If
                     strDestinationSQL &= ")"
-                    Using command As OdbcCommand = New OdbcCommand(strDestinationSQL, quNectConn)
-                        For Each field In upCnfg.destinationFields
-                            Dim qdbType As OdbcType
-                            qdbType = getODBCTypeFromQuickBaseFieldNode(field)
-                            command.Parameters.Add("@fid" & field.fid, qdbType)
+                    Using destinationCommand As OdbcCommand = New OdbcCommand(strDestinationSQL, quNectConn)
+                        Dim qdbTypes(upCnfg.destinationFields.Count) As OdbcType
+                        Dim j As Integer
+                        For j = 0 To upCnfg.destinationFields.Count - 1
+                            qdbTypes(j) = getODBCTypeFromQuickBaseFieldNode(upCnfg.destinationFields(j))
+                            destinationCommand.Parameters.Add("@fid" & upCnfg.destinationFields(j).fid, qdbTypes(j))
                         Next
 
                         Dim transaction As OdbcTransaction = Nothing
                         transaction = quNectConn.BeginTransaction()
-                        command.Transaction = transaction
-                        command.CommandType = CommandType.Text
-                        command.CommandTimeout = 0
+                        destinationCommand.Transaction = transaction
+                        destinationCommand.CommandType = CommandType.Text
+                        destinationCommand.CommandTimeout = 0
                         If Not automode Then
                             Dim progressThread As System.Threading.Thread = New Threading.Thread(AddressOf showProgress)
                             Volatile.Write(progressMessage, "Initializing...")
@@ -650,17 +650,18 @@ Public Class frmETL
                         Using srcCmd As OdbcCommand = New OdbcCommand(upCnfg.strSourceSQL, srcConnection)
                             Dim dr As OdbcDataReader
                             Try
+                                Dim sourceFieldMaxIndex As Integer = upCnfg.sourceFieldOrdinals.Count - 1
                                 dr = srcCmd.ExecuteReader()
                                 While (dr.Read())
-                                    For i As Integer = 0 To upCnfg.sourceFieldOrdinals.Count - 1
-                                        If setODBCParameter(dr.GetValue(upCnfg.sourceFieldOrdinals(i)), upCnfg.destinationFields(i).fid, command, conversionErrors) Then
+                                    For i As Integer = 0 To sourceFieldMaxIndex
+                                        If setODBCParameter(qdbTypes(i), dr.GetValue(upCnfg.sourceFieldOrdinals(i)), upCnfg.destinationFields(i).fid, destinationCommand, conversionErrors) Then
                                             Exit While
                                         End If
                                     Next
                                     If fileLineCounter Mod 1000 = 0 And Not automode Then
                                         Volatile.Write(progressMessage, "Queuing up record " & fileLineCounter)
                                     End If
-                                    fileLineCounter += command.ExecuteNonQuery()
+                                    fileLineCounter += destinationCommand.ExecuteNonQuery()
                                 End While
                                 If Not automode Then
                                     Volatile.Write(progressMessage, "Committing " & fileLineCounter & " records")
@@ -682,7 +683,7 @@ Public Class frmETL
                 Catch e As Exception
                     Alert("Could Not copy because " & e.Message)
                 Finally
-                    quNectConn.Close()
+
                 End Try
             End Using
         Catch ex As Exception
@@ -732,9 +733,6 @@ Public Class frmETL
         Return MsgBoxResult.Ok
     End Function
     Private Function getquNectConn(connectionString As String) As OdbcConnection
-        If qdbConnections.ContainsKey(connectionString) Then
-            Return qdbConnections(connectionString)
-        End If
         Dim quNectConn As OdbcConnection = New OdbcConnection(connectionString)
         Try
             quNectConn.Open()
@@ -762,7 +760,6 @@ Public Class frmETL
             Return Nothing
             Exit Function
         End If
-        qdbConnections.Add(connectionString, quNectConn)
         Return quNectConn
     End Function
 
