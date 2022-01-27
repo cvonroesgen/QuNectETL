@@ -103,6 +103,7 @@ Public Class frmETL
     Public Shared strSourceSQL As String = ""
     Private Title = "QuNect ETL"
     Private destinationFieldNodes As New Dictionary(Of String, qdbField)
+    Private qdbConnections As New Dictionary(Of String, OdbcConnection)
     Private rids As HashSet(Of String)
     Private keyfid As String
     Private uniqueExistingFieldValues As Dictionary(Of String, HashSet(Of String))
@@ -612,80 +613,79 @@ Public Class frmETL
     Private Function executeUpload(upCnfg As uploadConfig) As Boolean
         Try
             Dim strDestinationSQL As String = "INSERT INTO """ & upCnfg.DBID & """ (fid"
-            Using quNectConn As OdbcConnection = getquNectConn(upCnfg.cnctStrings.dst)
-                Try
-                    strDestinationSQL &= String.Join(", fid", upCnfg.destinationFields.ToArray) & ") VALUES ("
-                    For Each var In upCnfg.destinationFields
-                        strDestinationSQL &= "?,"
+            Dim quNectConn As OdbcConnection = getquNectConn(upCnfg.cnctStrings.dst)
+            Try
+                strDestinationSQL &= String.Join(", fid", upCnfg.destinationFields.ToArray) & ") VALUES ("
+                For Each var In upCnfg.destinationFields
+                    strDestinationSQL &= "?,"
+                Next
+                If strDestinationSQL.Length > 0 Then
+                    strDestinationSQL = strDestinationSQL.Substring(0, strDestinationSQL.Length - 1)
+                End If
+                strDestinationSQL &= ")"
+                Using destinationCommand As OdbcCommand = New OdbcCommand(strDestinationSQL, quNectConn)
+                    Dim qdbTypes(upCnfg.destinationFields.Count) As OdbcType
+                    Dim j As Integer
+                    For j = 0 To upCnfg.destinationFields.Count - 1
+                        qdbTypes(j) = getODBCTypeFromQuickBaseFieldNode(upCnfg.destinationFields(j))
+                        destinationCommand.Parameters.Add("@fid" & upCnfg.destinationFields(j).fid, qdbTypes(j))
                     Next
-                    If strDestinationSQL.Length > 0 Then
-                        strDestinationSQL = strDestinationSQL.Substring(0, strDestinationSQL.Length - 1)
+
+                    Dim transaction As OdbcTransaction = Nothing
+                    transaction = quNectConn.BeginTransaction()
+                    destinationCommand.Transaction = transaction
+                    destinationCommand.CommandType = CommandType.Text
+                    destinationCommand.CommandTimeout = 0
+                    If Not automode Then
+                        Dim progressThread As System.Threading.Thread = New Threading.Thread(AddressOf showProgress)
+                        Volatile.Write(progressMessage, "Initializing...")
+                        progressThread.Start()
                     End If
-                    strDestinationSQL &= ")"
-                    Using destinationCommand As OdbcCommand = New OdbcCommand(strDestinationSQL, quNectConn)
-                        Dim qdbTypes(upCnfg.destinationFields.Count) As OdbcType
-                        Dim j As Integer
-                        For j = 0 To upCnfg.destinationFields.Count - 1
-                            qdbTypes(j) = getODBCTypeFromQuickBaseFieldNode(upCnfg.destinationFields(j))
-                            destinationCommand.Parameters.Add("@fid" & upCnfg.destinationFields(j).fid, qdbTypes(j))
-                        Next
+                    'we have to open up a reader on the source
+                    Dim srcConnection As OdbcConnection
+                    srcConnection = New OdbcConnection(upCnfg.cnctStrings.src)
 
-                        Dim transaction As OdbcTransaction = Nothing
-                        transaction = quNectConn.BeginTransaction()
-                        destinationCommand.Transaction = transaction
-                        destinationCommand.CommandType = CommandType.Text
-                        destinationCommand.CommandTimeout = 0
-                        If Not automode Then
-                            Dim progressThread As System.Threading.Thread = New Threading.Thread(AddressOf showProgress)
-                            Volatile.Write(progressMessage, "Initializing...")
-                            progressThread.Start()
-                        End If
-                        'we have to open up a reader on the source
-                        Dim srcConnection As OdbcConnection
-                        srcConnection = New OdbcConnection(upCnfg.cnctStrings.src)
-
-                        srcConnection.Open()
-                        Dim fileLineCounter As Integer = 0
-                        Dim conversionErrors As String = ""
-                        Using srcCmd As OdbcCommand = New OdbcCommand(upCnfg.strSourceSQL, srcConnection)
-                            Dim dr As OdbcDataReader
-                            Try
-                                Dim sourceFieldMaxIndex As Integer = upCnfg.sourceFieldOrdinals.Count - 1
-                                dr = srcCmd.ExecuteReader()
-                                While (dr.Read())
-                                    For i As Integer = 0 To sourceFieldMaxIndex
-                                        If setODBCParameter(qdbTypes(i), dr.GetValue(upCnfg.sourceFieldOrdinals(i)), upCnfg.destinationFields(i).fid, destinationCommand, conversionErrors) Then
-                                            Exit While
-                                        End If
-                                    Next
-                                    If fileLineCounter Mod 1000 = 0 And Not automode Then
-                                        Volatile.Write(progressMessage, "Queuing up record " & fileLineCounter)
+                    srcConnection.Open()
+                    Dim fileLineCounter As Integer = 0
+                    Dim conversionErrors As String = ""
+                    Using srcCmd As OdbcCommand = New OdbcCommand(upCnfg.strSourceSQL, srcConnection)
+                        Dim dr As OdbcDataReader
+                        Try
+                            Dim sourceFieldMaxIndex As Integer = upCnfg.sourceFieldOrdinals.Count - 1
+                            dr = srcCmd.ExecuteReader()
+                            While (dr.Read())
+                                For i As Integer = 0 To sourceFieldMaxIndex
+                                    If setODBCParameter(qdbTypes(i), dr.GetValue(upCnfg.sourceFieldOrdinals(i)), upCnfg.destinationFields(i).fid, destinationCommand, conversionErrors) Then
+                                        Exit While
                                     End If
-                                    fileLineCounter += destinationCommand.ExecuteNonQuery()
-                                End While
-                                If Not automode Then
-                                    Volatile.Write(progressMessage, "Committing " & fileLineCounter & " records")
+                                Next
+                                If fileLineCounter Mod 1000 = 0 And Not automode Then
+                                    Volatile.Write(progressMessage, "Queuing up record " & fileLineCounter)
                                 End If
-                                transaction.Commit()
-                                If Not automode Then
-                                    Volatile.Write(progressMessage, "Committed " & fileLineCounter & " records")
-                                End If
-                                Alert(fileLineCounter & " rows were uploaded to Quickbase.")
-                            Catch excpt As Exception
-                                srcCmd.Cancel()
-                                srcCmd.Dispose()
-                                transaction.Rollback()
-                                srcConnection.Close()
-                                Throw New System.Exception("Could not get record " & fileLineCounter & " from " & upCnfg.cnctStrings.src & vbCrLf & excpt.Message)
-                            End Try
-                        End Using
+                                fileLineCounter += destinationCommand.ExecuteNonQuery()
+                            End While
+                            If Not automode Then
+                                Volatile.Write(progressMessage, "Committing " & fileLineCounter & " records")
+                            End If
+                            transaction.Commit()
+                            If Not automode Then
+                                Volatile.Write(progressMessage, "Committed " & fileLineCounter & " records")
+                            End If
+                            Alert(fileLineCounter & " rows were uploaded to Quickbase.")
+                        Catch excpt As Exception
+                            srcCmd.Cancel()
+                            srcCmd.Dispose()
+                            transaction.Rollback()
+                            srcConnection.Close()
+                            Throw New System.Exception("Could not get record " & fileLineCounter & " from " & upCnfg.cnctStrings.src & vbCrLf & excpt.Message)
+                        End Try
                     End Using
-                Catch e As Exception
-                    Alert("Could Not copy because " & e.Message)
-                Finally
+                End Using
+            Catch e As Exception
+                Alert("Could Not copy because " & e.Message)
+            Finally
 
-                End Try
-            End Using
+            End Try
         Catch ex As Exception
             If Not automode Then
                 Volatile.Write(progressMessage, "")
@@ -734,6 +734,9 @@ Public Class frmETL
     End Function
     Private Function getquNectConn(connectionString As String) As OdbcConnection
         Dim quNectConn As OdbcConnection = New OdbcConnection(connectionString)
+        If qdbConnections.ContainsKey(connectionString) Then
+            Return qdbConnections(connectionString)
+        End If
         Try
             quNectConn.Open()
         Catch excpt As Exception
@@ -762,9 +765,6 @@ Public Class frmETL
         End If
         Return quNectConn
     End Function
-
-
-
     Private Sub btnDestination_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDestination.Click
         listTables()
     End Sub
@@ -1052,6 +1052,13 @@ Public Class frmETL
 
     Private Sub txtDSNpwd_TextChanged(sender As Object, e As EventArgs) Handles txtDSNpwd.TextChanged
         SaveSetting(AppName, "Credentials", "DSNPWD", txtDSNpwd.Text)
+    End Sub
+
+    Protected Overrides Sub Finalize()
+        For Each connection In qdbConnections
+            connection.Value.Close()
+        Next
+        MyBase.Finalize()
     End Sub
 End Class
 
