@@ -498,7 +498,7 @@ Public Class frmETL
             End If
         End Using
     End Function
-    Function setODBCParameter(qdbType As OdbcType, val As Object, fid As String, command As OdbcCommand, ByRef conversionErrors As String) As Boolean
+    Function setODBCParameter(ByRef qdbType As OdbcType, ByRef val As Object, fid As String, ByRef command As OdbcCommand, ByRef conversionErrors As String) As Boolean
 
         If IsDBNull(val) Then
             command.Parameters("@fid" & fid).Value = val
