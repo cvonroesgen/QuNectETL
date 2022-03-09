@@ -22,80 +22,85 @@ Partial Class frmETL
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmETL))
         Me.dgMapping = New System.Windows.Forms.DataGridView()
         Me.Source = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Destination = New System.Windows.Forms.DataGridViewComboBoxColumn()
         Me.btnImport = New System.Windows.Forms.Button()
         Me.btnDestination = New System.Windows.Forms.Button()
-        Me.lblAppToken = New System.Windows.Forms.Label()
-        Me.txtAppToken = New System.Windows.Forms.TextBox()
-        Me.lblServer = New System.Windows.Forms.Label()
-        Me.txtServer = New System.Windows.Forms.TextBox()
-        Me.txtPassword = New System.Windows.Forms.TextBox()
-        Me.lblUsername = New System.Windows.Forms.Label()
-        Me.txtUsername = New System.Windows.Forms.TextBox()
-        Me.lblDestinationTable = New System.Windows.Forms.Label()
-        Me.ckbDetectProxy = New System.Windows.Forms.CheckBox()
         Me.btnListFields = New System.Windows.Forms.Button()
-        Me.lblProgress = New System.Windows.Forms.Label()
-        Me.cmbPassword = New System.Windows.Forms.ComboBox()
-        Me.btnAppToken = New System.Windows.Forms.Button()
-        Me.btnUserToken = New System.Windows.Forms.Button()
-        Me.btnSQLStatement = New System.Windows.Forms.Button()
-        Me.lblDSN = New System.Windows.Forms.Label()
-        Me.cmbDSN = New System.Windows.Forms.ComboBox()
-        Me.lblSQL = New System.Windows.Forms.Label()
         Me.btnSave = New System.Windows.Forms.Button()
         Me.saveDialog = New System.Windows.Forms.SaveFileDialog()
         Me.btnLoad = New System.Windows.Forms.Button()
         Me.openFile = New System.Windows.Forms.OpenFileDialog()
-        Me.lblDSNpwd = New System.Windows.Forms.Label()
-        Me.txtDSNpwd = New System.Windows.Forms.TextBox()
-        Me.txtDSNUsername = New System.Windows.Forms.TextBox()
-        Me.lblDSNUsername = New System.Windows.Forms.Label()
         Me.lblJobFile = New System.Windows.Forms.Label()
         Me.ckbLogSQL = New System.Windows.Forms.CheckBox()
+        Me.TabControl = New System.Windows.Forms.TabControl()
+        Me.TabPageSource = New System.Windows.Forms.TabPage()
+        Me.GroupBoxSQL = New System.Windows.Forms.GroupBox()
+        Me.btnSourceTable = New System.Windows.Forms.Button()
+        Me.txtSQL = New System.Windows.Forms.RichTextBox()
+        Me.GroupBoxSource = New System.Windows.Forms.GroupBox()
+        Me.rdbSourceConnectionString = New System.Windows.Forms.RadioButton()
+        Me.rdbSourceDSN = New System.Windows.Forms.RadioButton()
+        Me.txtSourceConnectionString = New System.Windows.Forms.TextBox()
+        Me.cmbSourceDSN = New System.Windows.Forms.ComboBox()
+        Me.TabPageDestination = New System.Windows.Forms.TabPage()
+        Me.GroupBoxDestination = New System.Windows.Forms.GroupBox()
+        Me.rdbDestinationDSN = New System.Windows.Forms.RadioButton()
+        Me.rdbDestinationConnectionString = New System.Windows.Forms.RadioButton()
+        Me.txtDestinationConnectionString = New System.Windows.Forms.TextBox()
+        Me.cmbDestinationDSN = New System.Windows.Forms.ComboBox()
+        Me.lblDestinationTable = New System.Windows.Forms.Label()
+        Me.TabPageMapping = New System.Windows.Forms.TabPage()
+        Me.lblProgress = New System.Windows.Forms.Label()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabControl.SuspendLayout()
+        Me.TabPageSource.SuspendLayout()
+        Me.GroupBoxSQL.SuspendLayout()
+        Me.GroupBoxSource.SuspendLayout()
+        Me.TabPageDestination.SuspendLayout()
+        Me.GroupBoxDestination.SuspendLayout()
+        Me.TabPageMapping.SuspendLayout()
         Me.SuspendLayout()
         '
         'dgMapping
         '
         Me.dgMapping.AllowUserToAddRows = False
         Me.dgMapping.AllowUserToDeleteRows = False
-        DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.dgMapping.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle4
+        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.dgMapping.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
         Me.dgMapping.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgMapping.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Source, Me.Destination})
-        DataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgMapping.DefaultCellStyle = DataGridViewCellStyle5
-        Me.dgMapping.Location = New System.Drawing.Point(12, 251)
+        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgMapping.DefaultCellStyle = DataGridViewCellStyle2
+        Me.dgMapping.Location = New System.Drawing.Point(14, 48)
         Me.dgMapping.Name = "dgMapping"
-        DataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.dgMapping.RowHeadersDefaultCellStyle = DataGridViewCellStyle6
+        DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.dgMapping.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.dgMapping.RowHeadersWidth = 62
-        Me.dgMapping.Size = New System.Drawing.Size(522, 439)
+        Me.dgMapping.Size = New System.Drawing.Size(603, 453)
         Me.dgMapping.TabIndex = 0
         '
         'Source
@@ -115,7 +120,7 @@ Partial Class frmETL
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(349, 218)
+        Me.btnImport.Location = New System.Drawing.Point(351, 15)
         Me.btnImport.Name = "btnImport"
         Me.btnImport.Size = New System.Drawing.Size(185, 27)
         Me.btnImport.TabIndex = 3
@@ -124,173 +129,26 @@ Partial Class frmETL
         '
         'btnDestination
         '
-        Me.btnDestination.Location = New System.Drawing.Point(12, 171)
+        Me.btnDestination.Location = New System.Drawing.Point(35, 198)
         Me.btnDestination.Name = "btnDestination"
         Me.btnDestination.Size = New System.Drawing.Size(154, 20)
         Me.btnDestination.TabIndex = 4
         Me.btnDestination.Text = "Choose Destination Table..."
         Me.btnDestination.UseVisualStyleBackColor = True
         '
-        'lblAppToken
-        '
-        Me.lblAppToken.AutoSize = True
-        Me.lblAppToken.Location = New System.Drawing.Point(15, 64)
-        Me.lblAppToken.Name = "lblAppToken"
-        Me.lblAppToken.Size = New System.Drawing.Size(148, 13)
-        Me.lblAppToken.TabIndex = 30
-        Me.lblAppToken.Text = "QuickBase Application Token"
-        '
-        'txtAppToken
-        '
-        Me.txtAppToken.Location = New System.Drawing.Point(12, 83)
-        Me.txtAppToken.Name = "txtAppToken"
-        Me.txtAppToken.Size = New System.Drawing.Size(258, 20)
-        Me.txtAppToken.TabIndex = 29
-        '
-        'lblServer
-        '
-        Me.lblServer.AutoSize = True
-        Me.lblServer.Location = New System.Drawing.Point(360, 11)
-        Me.lblServer.Name = "lblServer"
-        Me.lblServer.Size = New System.Drawing.Size(93, 13)
-        Me.lblServer.TabIndex = 28
-        Me.lblServer.Text = "QuickBase Server"
-        '
-        'txtServer
-        '
-        Me.txtServer.Location = New System.Drawing.Point(361, 30)
-        Me.txtServer.Name = "txtServer"
-        Me.txtServer.Size = New System.Drawing.Size(173, 20)
-        Me.txtServer.TabIndex = 27
-        '
-        'txtPassword
-        '
-        Me.txtPassword.Location = New System.Drawing.Point(188, 30)
-        Me.txtPassword.Name = "txtPassword"
-        Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtPassword.Size = New System.Drawing.Size(167, 20)
-        Me.txtPassword.TabIndex = 25
-        '
-        'lblUsername
-        '
-        Me.lblUsername.AutoSize = True
-        Me.lblUsername.Location = New System.Drawing.Point(15, 11)
-        Me.lblUsername.Name = "lblUsername"
-        Me.lblUsername.Size = New System.Drawing.Size(110, 13)
-        Me.lblUsername.TabIndex = 24
-        Me.lblUsername.Text = "QuickBase Username"
-        '
-        'txtUsername
-        '
-        Me.txtUsername.Location = New System.Drawing.Point(12, 30)
-        Me.txtUsername.Name = "txtUsername"
-        Me.txtUsername.Size = New System.Drawing.Size(172, 20)
-        Me.txtUsername.TabIndex = 23
-        '
-        'lblDestinationTable
-        '
-        Me.lblDestinationTable.AutoSize = True
-        Me.lblDestinationTable.Location = New System.Drawing.Point(171, 174)
-        Me.lblDestinationTable.Name = "lblDestinationTable"
-        Me.lblDestinationTable.Size = New System.Drawing.Size(0, 13)
-        Me.lblDestinationTable.TabIndex = 34
-        '
-        'ckbDetectProxy
-        '
-        Me.ckbDetectProxy.AutoSize = True
-        Me.ckbDetectProxy.Location = New System.Drawing.Point(286, 56)
-        Me.ckbDetectProxy.Name = "ckbDetectProxy"
-        Me.ckbDetectProxy.Size = New System.Drawing.Size(188, 17)
-        Me.ckbDetectProxy.TabIndex = 36
-        Me.ckbDetectProxy.Text = "Automatically detect proxy settings"
-        Me.ckbDetectProxy.UseVisualStyleBackColor = True
-        '
         'btnListFields
         '
-        Me.btnListFields.Location = New System.Drawing.Point(12, 220)
+        Me.btnListFields.Location = New System.Drawing.Point(14, 17)
         Me.btnListFields.Name = "btnListFields"
         Me.btnListFields.Size = New System.Drawing.Size(82, 27)
         Me.btnListFields.TabIndex = 37
         Me.btnListFields.Text = "List Fields"
         Me.btnListFields.UseVisualStyleBackColor = True
         '
-        'lblProgress
-        '
-        Me.lblProgress.AutoSize = True
-        Me.lblProgress.Location = New System.Drawing.Point(292, 83)
-        Me.lblProgress.Name = "lblProgress"
-        Me.lblProgress.Size = New System.Drawing.Size(0, 13)
-        Me.lblProgress.TabIndex = 42
-        '
-        'cmbPassword
-        '
-        Me.cmbPassword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cmbPassword.FormattingEnabled = True
-        Me.cmbPassword.Items.AddRange(New Object() {"Please choose...", "QuickBase Password", "QuickBase User Token"})
-        Me.cmbPassword.Location = New System.Drawing.Point(188, 8)
-        Me.cmbPassword.Name = "cmbPassword"
-        Me.cmbPassword.Size = New System.Drawing.Size(143, 21)
-        Me.cmbPassword.TabIndex = 46
-        '
-        'btnAppToken
-        '
-        Me.btnAppToken.Location = New System.Drawing.Point(160, 60)
-        Me.btnAppToken.Name = "btnAppToken"
-        Me.btnAppToken.Size = New System.Drawing.Size(19, 20)
-        Me.btnAppToken.TabIndex = 79
-        Me.btnAppToken.Text = "?"
-        Me.btnAppToken.UseVisualStyleBackColor = True
-        '
-        'btnUserToken
-        '
-        Me.btnUserToken.Location = New System.Drawing.Point(335, 9)
-        Me.btnUserToken.Name = "btnUserToken"
-        Me.btnUserToken.Size = New System.Drawing.Size(19, 20)
-        Me.btnUserToken.TabIndex = 80
-        Me.btnUserToken.Text = "?"
-        Me.btnUserToken.UseVisualStyleBackColor = True
-        '
-        'btnSQLStatement
-        '
-        Me.btnSQLStatement.Location = New System.Drawing.Point(12, 150)
-        Me.btnSQLStatement.Name = "btnSQLStatement"
-        Me.btnSQLStatement.Size = New System.Drawing.Size(154, 20)
-        Me.btnSQLStatement.TabIndex = 81
-        Me.btnSQLStatement.Text = "Enter Source SQL Statement"
-        Me.btnSQLStatement.UseVisualStyleBackColor = True
-        '
-        'lblDSN
-        '
-        Me.lblDSN.AutoSize = True
-        Me.lblDSN.Location = New System.Drawing.Point(15, 107)
-        Me.lblDSN.Name = "lblDSN"
-        Me.lblDSN.Size = New System.Drawing.Size(30, 13)
-        Me.lblDSN.TabIndex = 83
-        Me.lblDSN.Text = "DSN"
-        '
-        'cmbDSN
-        '
-        Me.cmbDSN.FormattingEnabled = True
-        Me.cmbDSN.Location = New System.Drawing.Point(12, 125)
-        Me.cmbDSN.Name = "cmbDSN"
-        Me.cmbDSN.Size = New System.Drawing.Size(168, 21)
-        Me.cmbDSN.TabIndex = 82
-        '
-        'lblSQL
-        '
-        Me.lblSQL.AutoEllipsis = True
-        Me.lblSQL.AutoSize = True
-        Me.lblSQL.Location = New System.Drawing.Point(171, 153)
-        Me.lblSQL.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblSQL.MaximumSize = New System.Drawing.Size(350, 13)
-        Me.lblSQL.Name = "lblSQL"
-        Me.lblSQL.Size = New System.Drawing.Size(0, 13)
-        Me.lblSQL.TabIndex = 84
-        '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(262, 219)
-        Me.btnSave.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnSave.Location = New System.Drawing.Point(264, 16)
+        Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(65, 27)
         Me.btnSave.TabIndex = 85
@@ -299,8 +157,8 @@ Partial Class frmETL
         '
         'btnLoad
         '
-        Me.btnLoad.Location = New System.Drawing.Point(116, 220)
-        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnLoad.Location = New System.Drawing.Point(118, 17)
+        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2)
         Me.btnLoad.Name = "btnLoad"
         Me.btnLoad.Size = New System.Drawing.Size(71, 26)
         Me.btnLoad.TabIndex = 86
@@ -310,43 +168,6 @@ Partial Class frmETL
         'openFile
         '
         Me.openFile.Filter = "QuNect ETL files|*.job"
-        '
-        'lblDSNpwd
-        '
-        Me.lblDSNpwd.AutoSize = True
-        Me.lblDSNpwd.Location = New System.Drawing.Point(371, 110)
-        Me.lblDSNpwd.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblDSNpwd.Name = "lblDSNpwd"
-        Me.lblDSNpwd.Size = New System.Drawing.Size(125, 13)
-        Me.lblDSNpwd.TabIndex = 87
-        Me.lblDSNpwd.Text = "DSN Password (optional)"
-        '
-        'txtDSNpwd
-        '
-        Me.txtDSNpwd.Location = New System.Drawing.Point(374, 125)
-        Me.txtDSNpwd.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
-        Me.txtDSNpwd.Name = "txtDSNpwd"
-        Me.txtDSNpwd.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtDSNpwd.Size = New System.Drawing.Size(160, 20)
-        Me.txtDSNpwd.TabIndex = 88
-        '
-        'txtDSNUsername
-        '
-        Me.txtDSNUsername.Location = New System.Drawing.Point(188, 125)
-        Me.txtDSNUsername.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
-        Me.txtDSNUsername.Name = "txtDSNUsername"
-        Me.txtDSNUsername.Size = New System.Drawing.Size(183, 20)
-        Me.txtDSNUsername.TabIndex = 90
-        '
-        'lblDSNUsername
-        '
-        Me.lblDSNUsername.AutoSize = True
-        Me.lblDSNUsername.Location = New System.Drawing.Point(185, 110)
-        Me.lblDSNUsername.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblDSNUsername.Name = "lblDSNUsername"
-        Me.lblDSNUsername.Size = New System.Drawing.Size(127, 13)
-        Me.lblDSNUsername.TabIndex = 89
-        Me.lblDSNUsername.Text = "DSN Username (optional)"
         '
         'lblJobFile
         '
@@ -360,51 +181,242 @@ Partial Class frmETL
         'ckbLogSQL
         '
         Me.ckbLogSQL.AutoSize = True
-        Me.ckbLogSQL.Location = New System.Drawing.Point(193, 224)
+        Me.ckbLogSQL.Location = New System.Drawing.Point(195, 21)
         Me.ckbLogSQL.Name = "ckbLogSQL"
         Me.ckbLogSQL.Size = New System.Drawing.Size(68, 17)
         Me.ckbLogSQL.TabIndex = 92
         Me.ckbLogSQL.Text = "Log SQL"
         Me.ckbLogSQL.UseVisualStyleBackColor = True
         '
+        'TabControl
+        '
+        Me.TabControl.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TabControl.Controls.Add(Me.TabPageSource)
+        Me.TabControl.Controls.Add(Me.TabPageDestination)
+        Me.TabControl.Controls.Add(Me.TabPageMapping)
+        Me.TabControl.Location = New System.Drawing.Point(19, 21)
+        Me.TabControl.Name = "TabControl"
+        Me.TabControl.SelectedIndex = 0
+        Me.TabControl.Size = New System.Drawing.Size(805, 812)
+        Me.TabControl.TabIndex = 93
+        '
+        'TabPageSource
+        '
+        Me.TabPageSource.Controls.Add(Me.GroupBoxSQL)
+        Me.TabPageSource.Controls.Add(Me.GroupBoxSource)
+        Me.TabPageSource.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageSource.Name = "TabPageSource"
+        Me.TabPageSource.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageSource.Size = New System.Drawing.Size(797, 786)
+        Me.TabPageSource.TabIndex = 1
+        Me.TabPageSource.Text = "Source"
+        Me.TabPageSource.UseVisualStyleBackColor = True
+        '
+        'GroupBoxSQL
+        '
+        Me.GroupBoxSQL.Controls.Add(Me.btnSourceTable)
+        Me.GroupBoxSQL.Controls.Add(Me.txtSQL)
+        Me.GroupBoxSQL.Location = New System.Drawing.Point(19, 173)
+        Me.GroupBoxSQL.Name = "GroupBoxSQL"
+        Me.GroupBoxSQL.Size = New System.Drawing.Size(767, 602)
+        Me.GroupBoxSQL.TabIndex = 107
+        Me.GroupBoxSQL.TabStop = False
+        Me.GroupBoxSQL.Text = "Table or SQL Statement"
+        '
+        'btnSourceTable
+        '
+        Me.btnSourceTable.Location = New System.Drawing.Point(6, 44)
+        Me.btnSourceTable.Name = "btnSourceTable"
+        Me.btnSourceTable.Size = New System.Drawing.Size(176, 26)
+        Me.btnSourceTable.TabIndex = 96
+        Me.btnSourceTable.Text = "Choose source table"
+        Me.btnSourceTable.UseVisualStyleBackColor = True
+        '
+        'txtSQL
+        '
+        Me.txtSQL.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSQL.Location = New System.Drawing.Point(6, 97)
+        Me.txtSQL.Name = "txtSQL"
+        Me.txtSQL.Size = New System.Drawing.Size(753, 490)
+        Me.txtSQL.TabIndex = 93
+        Me.txtSQL.Text = ""
+        '
+        'GroupBoxSource
+        '
+        Me.GroupBoxSource.Controls.Add(Me.rdbSourceConnectionString)
+        Me.GroupBoxSource.Controls.Add(Me.rdbSourceDSN)
+        Me.GroupBoxSource.Controls.Add(Me.txtSourceConnectionString)
+        Me.GroupBoxSource.Controls.Add(Me.cmbSourceDSN)
+        Me.GroupBoxSource.Location = New System.Drawing.Point(21, 15)
+        Me.GroupBoxSource.Name = "GroupBoxSource"
+        Me.GroupBoxSource.Size = New System.Drawing.Size(701, 152)
+        Me.GroupBoxSource.TabIndex = 106
+        Me.GroupBoxSource.TabStop = False
+        Me.GroupBoxSource.Text = "Choose Source"
+        '
+        'rdbSourceConnectionString
+        '
+        Me.rdbSourceConnectionString.AutoSize = True
+        Me.rdbSourceConnectionString.Location = New System.Drawing.Point(15, 84)
+        Me.rdbSourceConnectionString.Name = "rdbSourceConnectionString"
+        Me.rdbSourceConnectionString.Size = New System.Drawing.Size(143, 17)
+        Me.rdbSourceConnectionString.TabIndex = 105
+        Me.rdbSourceConnectionString.Text = "Enter a connection string"
+        Me.rdbSourceConnectionString.UseVisualStyleBackColor = True
+        '
+        'rdbSourceDSN
+        '
+        Me.rdbSourceDSN.AutoSize = True
+        Me.rdbSourceDSN.Checked = True
+        Me.rdbSourceDSN.Location = New System.Drawing.Point(16, 15)
+        Me.rdbSourceDSN.Name = "rdbSourceDSN"
+        Me.rdbSourceDSN.Size = New System.Drawing.Size(48, 17)
+        Me.rdbSourceDSN.TabIndex = 104
+        Me.rdbSourceDSN.TabStop = True
+        Me.rdbSourceDSN.Text = "DSN"
+        Me.rdbSourceDSN.UseVisualStyleBackColor = True
+        '
+        'txtSourceConnectionString
+        '
+        Me.txtSourceConnectionString.Enabled = False
+        Me.txtSourceConnectionString.Location = New System.Drawing.Point(13, 111)
+        Me.txtSourceConnectionString.Margin = New System.Windows.Forms.Padding(2)
+        Me.txtSourceConnectionString.Name = "txtSourceConnectionString"
+        Me.txtSourceConnectionString.Size = New System.Drawing.Size(644, 20)
+        Me.txtSourceConnectionString.TabIndex = 103
+        '
+        'cmbSourceDSN
+        '
+        Me.cmbSourceDSN.FormattingEnabled = True
+        Me.cmbSourceDSN.Location = New System.Drawing.Point(12, 44)
+        Me.cmbSourceDSN.Name = "cmbSourceDSN"
+        Me.cmbSourceDSN.Size = New System.Drawing.Size(168, 21)
+        Me.cmbSourceDSN.TabIndex = 98
+        '
+        'TabPageDestination
+        '
+        Me.TabPageDestination.Controls.Add(Me.GroupBoxDestination)
+        Me.TabPageDestination.Controls.Add(Me.btnDestination)
+        Me.TabPageDestination.Controls.Add(Me.lblDestinationTable)
+        Me.TabPageDestination.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageDestination.Name = "TabPageDestination"
+        Me.TabPageDestination.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageDestination.Size = New System.Drawing.Size(797, 786)
+        Me.TabPageDestination.TabIndex = 2
+        Me.TabPageDestination.Text = "Destination"
+        Me.TabPageDestination.UseVisualStyleBackColor = True
+        '
+        'GroupBoxDestination
+        '
+        Me.GroupBoxDestination.Controls.Add(Me.rdbDestinationDSN)
+        Me.GroupBoxDestination.Controls.Add(Me.rdbDestinationConnectionString)
+        Me.GroupBoxDestination.Controls.Add(Me.txtDestinationConnectionString)
+        Me.GroupBoxDestination.Controls.Add(Me.cmbDestinationDSN)
+        Me.GroupBoxDestination.Location = New System.Drawing.Point(27, 16)
+        Me.GroupBoxDestination.Name = "GroupBoxDestination"
+        Me.GroupBoxDestination.Size = New System.Drawing.Size(682, 151)
+        Me.GroupBoxDestination.TabIndex = 97
+        Me.GroupBoxDestination.TabStop = False
+        Me.GroupBoxDestination.Text = "Choose Destination"
+        '
+        'rdbDestinationDSN
+        '
+        Me.rdbDestinationDSN.AutoSize = True
+        Me.rdbDestinationDSN.Checked = True
+        Me.rdbDestinationDSN.Location = New System.Drawing.Point(13, 21)
+        Me.rdbDestinationDSN.Name = "rdbDestinationDSN"
+        Me.rdbDestinationDSN.Size = New System.Drawing.Size(48, 17)
+        Me.rdbDestinationDSN.TabIndex = 108
+        Me.rdbDestinationDSN.TabStop = True
+        Me.rdbDestinationDSN.Text = "DSN"
+        Me.rdbDestinationDSN.UseVisualStyleBackColor = True
+        '
+        'rdbDestinationConnectionString
+        '
+        Me.rdbDestinationConnectionString.AutoSize = True
+        Me.rdbDestinationConnectionString.Location = New System.Drawing.Point(11, 81)
+        Me.rdbDestinationConnectionString.Name = "rdbDestinationConnectionString"
+        Me.rdbDestinationConnectionString.Size = New System.Drawing.Size(143, 17)
+        Me.rdbDestinationConnectionString.TabIndex = 107
+        Me.rdbDestinationConnectionString.Text = "Enter a connection string"
+        Me.rdbDestinationConnectionString.UseVisualStyleBackColor = True
+        '
+        'txtDestinationConnectionString
+        '
+        Me.txtDestinationConnectionString.Enabled = False
+        Me.txtDestinationConnectionString.Location = New System.Drawing.Point(9, 108)
+        Me.txtDestinationConnectionString.Margin = New System.Windows.Forms.Padding(2)
+        Me.txtDestinationConnectionString.Name = "txtDestinationConnectionString"
+        Me.txtDestinationConnectionString.Size = New System.Drawing.Size(644, 20)
+        Me.txtDestinationConnectionString.TabIndex = 106
+        '
+        'cmbDestinationDSN
+        '
+        Me.cmbDestinationDSN.FormattingEnabled = True
+        Me.cmbDestinationDSN.Location = New System.Drawing.Point(8, 41)
+        Me.cmbDestinationDSN.Name = "cmbDestinationDSN"
+        Me.cmbDestinationDSN.Size = New System.Drawing.Size(168, 21)
+        Me.cmbDestinationDSN.TabIndex = 91
+        '
+        'lblDestinationTable
+        '
+        Me.lblDestinationTable.AutoSize = True
+        Me.lblDestinationTable.Location = New System.Drawing.Point(195, 203)
+        Me.lblDestinationTable.Name = "lblDestinationTable"
+        Me.lblDestinationTable.Size = New System.Drawing.Size(0, 13)
+        Me.lblDestinationTable.TabIndex = 35
+        '
+        'TabPageMapping
+        '
+        Me.TabPageMapping.Controls.Add(Me.lblProgress)
+        Me.TabPageMapping.Controls.Add(Me.dgMapping)
+        Me.TabPageMapping.Controls.Add(Me.ckbLogSQL)
+        Me.TabPageMapping.Controls.Add(Me.btnImport)
+        Me.TabPageMapping.Controls.Add(Me.btnLoad)
+        Me.TabPageMapping.Controls.Add(Me.btnListFields)
+        Me.TabPageMapping.Controls.Add(Me.btnSave)
+        Me.TabPageMapping.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageMapping.Name = "TabPageMapping"
+        Me.TabPageMapping.Size = New System.Drawing.Size(797, 786)
+        Me.TabPageMapping.TabIndex = 3
+        Me.TabPageMapping.Text = "Column Mapping"
+        Me.TabPageMapping.UseVisualStyleBackColor = True
+        '
+        'lblProgress
+        '
+        Me.lblProgress.AutoSize = True
+        Me.lblProgress.Location = New System.Drawing.Point(662, 40)
+        Me.lblProgress.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblProgress.Name = "lblProgress"
+        Me.lblProgress.Size = New System.Drawing.Size(0, 13)
+        Me.lblProgress.TabIndex = 93
+        '
         'frmETL
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(545, 700)
-        Me.Controls.Add(Me.ckbLogSQL)
+        Me.ClientSize = New System.Drawing.Size(833, 842)
+        Me.Controls.Add(Me.TabControl)
         Me.Controls.Add(Me.lblJobFile)
-        Me.Controls.Add(Me.txtDSNUsername)
-        Me.Controls.Add(Me.lblDSNUsername)
-        Me.Controls.Add(Me.txtDSNpwd)
-        Me.Controls.Add(Me.lblDSNpwd)
-        Me.Controls.Add(Me.btnLoad)
-        Me.Controls.Add(Me.btnSave)
-        Me.Controls.Add(Me.lblSQL)
-        Me.Controls.Add(Me.lblDSN)
-        Me.Controls.Add(Me.cmbDSN)
-        Me.Controls.Add(Me.btnSQLStatement)
-        Me.Controls.Add(Me.btnUserToken)
-        Me.Controls.Add(Me.btnAppToken)
-        Me.Controls.Add(Me.cmbPassword)
-        Me.Controls.Add(Me.lblProgress)
-        Me.Controls.Add(Me.btnListFields)
-        Me.Controls.Add(Me.ckbDetectProxy)
-        Me.Controls.Add(Me.lblDestinationTable)
-        Me.Controls.Add(Me.lblAppToken)
-        Me.Controls.Add(Me.txtAppToken)
-        Me.Controls.Add(Me.lblServer)
-        Me.Controls.Add(Me.txtServer)
-        Me.Controls.Add(Me.txtPassword)
-        Me.Controls.Add(Me.lblUsername)
-        Me.Controls.Add(Me.txtUsername)
-        Me.Controls.Add(Me.btnDestination)
-        Me.Controls.Add(Me.btnImport)
-        Me.Controls.Add(Me.dgMapping)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmETL"
         Me.Text = "QuNect ETL"
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabControl.ResumeLayout(False)
+        Me.TabPageSource.ResumeLayout(False)
+        Me.GroupBoxSQL.ResumeLayout(False)
+        Me.GroupBoxSource.ResumeLayout(False)
+        Me.GroupBoxSource.PerformLayout()
+        Me.TabPageDestination.ResumeLayout(False)
+        Me.TabPageDestination.PerformLayout()
+        Me.GroupBoxDestination.ResumeLayout(False)
+        Me.GroupBoxDestination.PerformLayout()
+        Me.TabPageMapping.ResumeLayout(False)
+        Me.TabPageMapping.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -412,34 +424,32 @@ Partial Class frmETL
     Friend WithEvents dgMapping As System.Windows.Forms.DataGridView
     Friend WithEvents btnImport As System.Windows.Forms.Button
     Friend WithEvents btnDestination As System.Windows.Forms.Button
-    Friend WithEvents lblAppToken As System.Windows.Forms.Label
-    Friend WithEvents txtAppToken As System.Windows.Forms.TextBox
-    Friend WithEvents lblServer As System.Windows.Forms.Label
-    Friend WithEvents txtServer As System.Windows.Forms.TextBox
-    Friend WithEvents txtPassword As System.Windows.Forms.TextBox
-    Friend WithEvents lblUsername As System.Windows.Forms.Label
-    Friend WithEvents txtUsername As System.Windows.Forms.TextBox
-    Friend WithEvents lblDestinationTable As System.Windows.Forms.Label
-    Friend WithEvents ckbDetectProxy As System.Windows.Forms.CheckBox
     Friend WithEvents btnListFields As System.Windows.Forms.Button
     Friend WithEvents Source As DataGridViewTextBoxColumn
     Friend WithEvents Destination As DataGridViewComboBoxColumn
-    Friend WithEvents lblProgress As Label
-    Friend WithEvents cmbPassword As ComboBox
-    Friend WithEvents btnAppToken As Button
-    Friend WithEvents btnUserToken As Button
-    Friend WithEvents btnSQLStatement As Button
-    Friend WithEvents lblDSN As Label
-    Friend WithEvents cmbDSN As ComboBox
-    Friend WithEvents lblSQL As Label
     Friend WithEvents btnSave As Button
     Friend WithEvents saveDialog As SaveFileDialog
     Friend WithEvents btnLoad As Button
     Friend WithEvents openFile As OpenFileDialog
-    Friend WithEvents lblDSNpwd As Label
-    Friend WithEvents txtDSNpwd As TextBox
-    Friend WithEvents txtDSNUsername As TextBox
-    Friend WithEvents lblDSNUsername As Label
     Friend WithEvents lblJobFile As Label
     Friend WithEvents ckbLogSQL As CheckBox
+    Friend WithEvents TabControl As TabControl
+    Friend WithEvents TabPageSource As TabPage
+    Friend WithEvents TabPageDestination As TabPage
+    Friend WithEvents TabPageMapping As TabPage
+    Friend WithEvents btnSourceTable As Button
+    Friend WithEvents txtSQL As RichTextBox
+    Friend WithEvents lblDestinationTable As Label
+    Friend WithEvents cmbDestinationDSN As ComboBox
+    Friend WithEvents lblProgress As Label
+    Friend WithEvents GroupBoxSource As GroupBox
+    Friend WithEvents rdbSourceConnectionString As RadioButton
+    Friend WithEvents rdbSourceDSN As RadioButton
+    Friend WithEvents txtSourceConnectionString As TextBox
+    Friend WithEvents cmbSourceDSN As ComboBox
+    Friend WithEvents GroupBoxSQL As GroupBox
+    Friend WithEvents GroupBoxDestination As GroupBox
+    Friend WithEvents rdbDestinationConnectionString As RadioButton
+    Friend WithEvents txtDestinationConnectionString As TextBox
+    Friend WithEvents rdbDestinationDSN As RadioButton
 End Class

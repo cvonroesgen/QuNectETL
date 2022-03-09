@@ -21,10 +21,16 @@
         End If
 
 
-        If tvAppsTables.SelectedNode.Level <> 1 Then
-            frmETL.lblDestinationTable.Text = ""
+        If tvAppsTables.SelectedNode.Level = 1 Then
+            If frmETL.TabControl.SelectedTab.Name = "TabPageSource" Then
+                frmETL.txtSQL.Text = "SELECT * FROM """ & tvAppsTables.SelectedNode.Text() & """"
+            Else
+                frmETL.lblDestinationTable.Text = tvAppsTables.SelectedNode.Text()
+            End If
         Else
-            frmETL.lblDestinationTable.Text = tvAppsTables.SelectedNode.FullPath()
+            If frmETL.TabControl.SelectedTab.Name <> "TabPageSource" Then
+                frmETL.lblDestinationTable.Text = ""
+            End If
         End If
         hideButtons()
         Me.Hide()
