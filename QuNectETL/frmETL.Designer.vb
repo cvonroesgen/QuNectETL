@@ -44,12 +44,20 @@ Partial Class frmETL
         Me.btnSourceTable = New System.Windows.Forms.Button()
         Me.txtSQL = New System.Windows.Forms.RichTextBox()
         Me.GroupBoxSource = New System.Windows.Forms.GroupBox()
+        Me.txtSourcePWD = New System.Windows.Forms.TextBox()
+        Me.txtSourceUID = New System.Windows.Forms.TextBox()
+        Me.lblSourcePWD = New System.Windows.Forms.Label()
+        Me.lblSourceUID = New System.Windows.Forms.Label()
         Me.rdbSourceConnectionString = New System.Windows.Forms.RadioButton()
         Me.rdbSourceDSN = New System.Windows.Forms.RadioButton()
         Me.txtSourceConnectionString = New System.Windows.Forms.TextBox()
         Me.cmbSourceDSN = New System.Windows.Forms.ComboBox()
         Me.TabPageDestination = New System.Windows.Forms.TabPage()
         Me.GroupBoxDestination = New System.Windows.Forms.GroupBox()
+        Me.lblDestinationPWD = New System.Windows.Forms.Label()
+        Me.lblDestinationUID = New System.Windows.Forms.Label()
+        Me.txtDestinationPWD = New System.Windows.Forms.TextBox()
+        Me.txtDestinationUID = New System.Windows.Forms.TextBox()
         Me.rdbDestinationDSN = New System.Windows.Forms.RadioButton()
         Me.rdbDestinationConnectionString = New System.Windows.Forms.RadioButton()
         Me.txtDestinationConnectionString = New System.Windows.Forms.TextBox()
@@ -89,7 +97,8 @@ Partial Class frmETL
         DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
         DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.dgMapping.DefaultCellStyle = DataGridViewCellStyle2
-        Me.dgMapping.Location = New System.Drawing.Point(14, 48)
+        Me.dgMapping.Location = New System.Drawing.Point(21, 130)
+        Me.dgMapping.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.dgMapping.Name = "dgMapping"
         DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control
@@ -100,7 +109,7 @@ Partial Class frmETL
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
         Me.dgMapping.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.dgMapping.RowHeadersWidth = 62
-        Me.dgMapping.Size = New System.Drawing.Size(603, 453)
+        Me.dgMapping.Size = New System.Drawing.Size(904, 697)
         Me.dgMapping.TabIndex = 0
         '
         'Source
@@ -120,47 +129,48 @@ Partial Class frmETL
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(351, 15)
+        Me.btnImport.Location = New System.Drawing.Point(514, 24)
+        Me.btnImport.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnImport.Name = "btnImport"
-        Me.btnImport.Size = New System.Drawing.Size(185, 27)
+        Me.btnImport.Size = New System.Drawing.Size(278, 42)
         Me.btnImport.TabIndex = 3
         Me.btnImport.Text = "Copy from Source to Destination"
         Me.btnImport.UseVisualStyleBackColor = True
         '
         'btnDestination
         '
-        Me.btnDestination.Location = New System.Drawing.Point(35, 198)
+        Me.btnDestination.Location = New System.Drawing.Point(28, 242)
+        Me.btnDestination.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnDestination.Name = "btnDestination"
-        Me.btnDestination.Size = New System.Drawing.Size(154, 20)
+        Me.btnDestination.Size = New System.Drawing.Size(231, 31)
         Me.btnDestination.TabIndex = 4
         Me.btnDestination.Text = "Choose Destination Table..."
         Me.btnDestination.UseVisualStyleBackColor = True
         '
         'btnListFields
         '
-        Me.btnListFields.Location = New System.Drawing.Point(14, 17)
+        Me.btnListFields.Location = New System.Drawing.Point(21, 26)
+        Me.btnListFields.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnListFields.Name = "btnListFields"
-        Me.btnListFields.Size = New System.Drawing.Size(82, 27)
+        Me.btnListFields.Size = New System.Drawing.Size(123, 42)
         Me.btnListFields.TabIndex = 37
         Me.btnListFields.Text = "List Fields"
         Me.btnListFields.UseVisualStyleBackColor = True
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(264, 16)
-        Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnSave.Location = New System.Drawing.Point(396, 25)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(65, 27)
+        Me.btnSave.Size = New System.Drawing.Size(98, 42)
         Me.btnSave.TabIndex = 85
         Me.btnSave.Text = "Save Job"
         Me.btnSave.UseVisualStyleBackColor = True
         '
         'btnLoad
         '
-        Me.btnLoad.Location = New System.Drawing.Point(118, 17)
-        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnLoad.Location = New System.Drawing.Point(161, 27)
         Me.btnLoad.Name = "btnLoad"
-        Me.btnLoad.Size = New System.Drawing.Size(71, 26)
+        Me.btnLoad.Size = New System.Drawing.Size(106, 40)
         Me.btnLoad.TabIndex = 86
         Me.btnLoad.Text = "Load Job"
         Me.btnLoad.UseVisualStyleBackColor = True
@@ -172,18 +182,18 @@ Partial Class frmETL
         'lblJobFile
         '
         Me.lblJobFile.AutoSize = True
-        Me.lblJobFile.Location = New System.Drawing.Point(15, 198)
-        Me.lblJobFile.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblJobFile.Location = New System.Drawing.Point(26, 92)
         Me.lblJobFile.Name = "lblJobFile"
-        Me.lblJobFile.Size = New System.Drawing.Size(0, 13)
+        Me.lblJobFile.Size = New System.Drawing.Size(0, 20)
         Me.lblJobFile.TabIndex = 91
         '
         'ckbLogSQL
         '
         Me.ckbLogSQL.AutoSize = True
-        Me.ckbLogSQL.Location = New System.Drawing.Point(195, 21)
+        Me.ckbLogSQL.Location = New System.Drawing.Point(292, 32)
+        Me.ckbLogSQL.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.ckbLogSQL.Name = "ckbLogSQL"
-        Me.ckbLogSQL.Size = New System.Drawing.Size(68, 17)
+        Me.ckbLogSQL.Size = New System.Drawing.Size(91, 24)
         Me.ckbLogSQL.TabIndex = 92
         Me.ckbLogSQL.Text = "Log SQL"
         Me.ckbLogSQL.UseVisualStyleBackColor = True
@@ -196,40 +206,48 @@ Partial Class frmETL
         Me.TabControl.Controls.Add(Me.TabPageSource)
         Me.TabControl.Controls.Add(Me.TabPageDestination)
         Me.TabControl.Controls.Add(Me.TabPageMapping)
-        Me.TabControl.Location = New System.Drawing.Point(19, 21)
+        Me.TabControl.Location = New System.Drawing.Point(28, 23)
+        Me.TabControl.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabControl.Name = "TabControl"
         Me.TabControl.SelectedIndex = 0
-        Me.TabControl.Size = New System.Drawing.Size(805, 812)
+        Me.TabControl.Size = New System.Drawing.Size(1208, 1249)
         Me.TabControl.TabIndex = 93
         '
         'TabPageSource
         '
         Me.TabPageSource.Controls.Add(Me.GroupBoxSQL)
         Me.TabPageSource.Controls.Add(Me.GroupBoxSource)
-        Me.TabPageSource.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageSource.Location = New System.Drawing.Point(4, 29)
+        Me.TabPageSource.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPageSource.Name = "TabPageSource"
-        Me.TabPageSource.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageSource.Size = New System.Drawing.Size(797, 786)
+        Me.TabPageSource.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TabPageSource.Size = New System.Drawing.Size(1200, 1216)
         Me.TabPageSource.TabIndex = 1
         Me.TabPageSource.Text = "Source"
         Me.TabPageSource.UseVisualStyleBackColor = True
         '
         'GroupBoxSQL
         '
+        Me.GroupBoxSQL.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBoxSQL.Controls.Add(Me.btnSourceTable)
         Me.GroupBoxSQL.Controls.Add(Me.txtSQL)
-        Me.GroupBoxSQL.Location = New System.Drawing.Point(19, 173)
+        Me.GroupBoxSQL.Location = New System.Drawing.Point(28, 237)
+        Me.GroupBoxSQL.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBoxSQL.Name = "GroupBoxSQL"
-        Me.GroupBoxSQL.Size = New System.Drawing.Size(767, 602)
+        Me.GroupBoxSQL.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBoxSQL.Size = New System.Drawing.Size(1150, 969)
         Me.GroupBoxSQL.TabIndex = 107
         Me.GroupBoxSQL.TabStop = False
         Me.GroupBoxSQL.Text = "Table or SQL Statement"
         '
         'btnSourceTable
         '
-        Me.btnSourceTable.Location = New System.Drawing.Point(6, 44)
+        Me.btnSourceTable.Location = New System.Drawing.Point(9, 45)
+        Me.btnSourceTable.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnSourceTable.Name = "btnSourceTable"
-        Me.btnSourceTable.Size = New System.Drawing.Size(176, 26)
+        Me.btnSourceTable.Size = New System.Drawing.Size(264, 40)
         Me.btnSourceTable.TabIndex = 96
         Me.btnSourceTable.Text = "Choose source table"
         Me.btnSourceTable.UseVisualStyleBackColor = True
@@ -239,31 +257,73 @@ Partial Class frmETL
         Me.txtSQL.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtSQL.Location = New System.Drawing.Point(6, 97)
+        Me.txtSQL.Location = New System.Drawing.Point(14, 102)
+        Me.txtSQL.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtSQL.Name = "txtSQL"
-        Me.txtSQL.Size = New System.Drawing.Size(753, 490)
+        Me.txtSQL.Size = New System.Drawing.Size(1128, 857)
         Me.txtSQL.TabIndex = 93
         Me.txtSQL.Text = ""
         '
         'GroupBoxSource
         '
+        Me.GroupBoxSource.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxSource.Controls.Add(Me.txtSourcePWD)
+        Me.GroupBoxSource.Controls.Add(Me.txtSourceUID)
+        Me.GroupBoxSource.Controls.Add(Me.lblSourcePWD)
+        Me.GroupBoxSource.Controls.Add(Me.lblSourceUID)
         Me.GroupBoxSource.Controls.Add(Me.rdbSourceConnectionString)
         Me.GroupBoxSource.Controls.Add(Me.rdbSourceDSN)
         Me.GroupBoxSource.Controls.Add(Me.txtSourceConnectionString)
         Me.GroupBoxSource.Controls.Add(Me.cmbSourceDSN)
-        Me.GroupBoxSource.Location = New System.Drawing.Point(21, 15)
+        Me.GroupBoxSource.Location = New System.Drawing.Point(28, 23)
+        Me.GroupBoxSource.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBoxSource.Name = "GroupBoxSource"
-        Me.GroupBoxSource.Size = New System.Drawing.Size(701, 152)
+        Me.GroupBoxSource.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBoxSource.Size = New System.Drawing.Size(1150, 195)
         Me.GroupBoxSource.TabIndex = 106
         Me.GroupBoxSource.TabStop = False
         Me.GroupBoxSource.Text = "Choose Source"
         '
+        'txtSourcePWD
+        '
+        Me.txtSourcePWD.Location = New System.Drawing.Point(870, 60)
+        Me.txtSourcePWD.Name = "txtSourcePWD"
+        Me.txtSourcePWD.Size = New System.Drawing.Size(261, 26)
+        Me.txtSourcePWD.TabIndex = 116
+        '
+        'txtSourceUID
+        '
+        Me.txtSourceUID.Location = New System.Drawing.Point(540, 60)
+        Me.txtSourceUID.Name = "txtSourceUID"
+        Me.txtSourceUID.Size = New System.Drawing.Size(310, 26)
+        Me.txtSourceUID.TabIndex = 115
+        '
+        'lblSourcePWD
+        '
+        Me.lblSourcePWD.AutoSize = True
+        Me.lblSourcePWD.Location = New System.Drawing.Point(866, 30)
+        Me.lblSourcePWD.Name = "lblSourcePWD"
+        Me.lblSourcePWD.Size = New System.Drawing.Size(148, 20)
+        Me.lblSourcePWD.TabIndex = 114
+        Me.lblSourcePWD.Text = "Password (optional)"
+        '
+        'lblSourceUID
+        '
+        Me.lblSourceUID.AutoSize = True
+        Me.lblSourceUID.Location = New System.Drawing.Point(536, 30)
+        Me.lblSourceUID.Name = "lblSourceUID"
+        Me.lblSourceUID.Size = New System.Drawing.Size(153, 20)
+        Me.lblSourceUID.TabIndex = 113
+        Me.lblSourceUID.Text = "Username (optional)"
+        '
         'rdbSourceConnectionString
         '
         Me.rdbSourceConnectionString.AutoSize = True
-        Me.rdbSourceConnectionString.Location = New System.Drawing.Point(15, 84)
+        Me.rdbSourceConnectionString.Location = New System.Drawing.Point(24, 109)
+        Me.rdbSourceConnectionString.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.rdbSourceConnectionString.Name = "rdbSourceConnectionString"
-        Me.rdbSourceConnectionString.Size = New System.Drawing.Size(143, 17)
+        Me.rdbSourceConnectionString.Size = New System.Drawing.Size(204, 24)
         Me.rdbSourceConnectionString.TabIndex = 105
         Me.rdbSourceConnectionString.Text = "Enter a connection string"
         Me.rdbSourceConnectionString.UseVisualStyleBackColor = True
@@ -272,9 +332,10 @@ Partial Class frmETL
         '
         Me.rdbSourceDSN.AutoSize = True
         Me.rdbSourceDSN.Checked = True
-        Me.rdbSourceDSN.Location = New System.Drawing.Point(16, 15)
+        Me.rdbSourceDSN.Location = New System.Drawing.Point(24, 26)
+        Me.rdbSourceDSN.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.rdbSourceDSN.Name = "rdbSourceDSN"
-        Me.rdbSourceDSN.Size = New System.Drawing.Size(48, 17)
+        Me.rdbSourceDSN.Size = New System.Drawing.Size(61, 24)
         Me.rdbSourceDSN.TabIndex = 104
         Me.rdbSourceDSN.TabStop = True
         Me.rdbSourceDSN.Text = "DSN"
@@ -282,19 +343,21 @@ Partial Class frmETL
         '
         'txtSourceConnectionString
         '
+        Me.txtSourceConnectionString.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtSourceConnectionString.Enabled = False
-        Me.txtSourceConnectionString.Location = New System.Drawing.Point(13, 111)
-        Me.txtSourceConnectionString.Margin = New System.Windows.Forms.Padding(2)
+        Me.txtSourceConnectionString.Location = New System.Drawing.Point(24, 141)
         Me.txtSourceConnectionString.Name = "txtSourceConnectionString"
-        Me.txtSourceConnectionString.Size = New System.Drawing.Size(644, 20)
+        Me.txtSourceConnectionString.Size = New System.Drawing.Size(1118, 26)
         Me.txtSourceConnectionString.TabIndex = 103
         '
         'cmbSourceDSN
         '
         Me.cmbSourceDSN.FormattingEnabled = True
-        Me.cmbSourceDSN.Location = New System.Drawing.Point(12, 44)
+        Me.cmbSourceDSN.Location = New System.Drawing.Point(24, 60)
+        Me.cmbSourceDSN.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbSourceDSN.Name = "cmbSourceDSN"
-        Me.cmbSourceDSN.Size = New System.Drawing.Size(168, 21)
+        Me.cmbSourceDSN.Size = New System.Drawing.Size(500, 28)
         Me.cmbSourceDSN.TabIndex = 98
         '
         'TabPageDestination
@@ -302,34 +365,76 @@ Partial Class frmETL
         Me.TabPageDestination.Controls.Add(Me.GroupBoxDestination)
         Me.TabPageDestination.Controls.Add(Me.btnDestination)
         Me.TabPageDestination.Controls.Add(Me.lblDestinationTable)
-        Me.TabPageDestination.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageDestination.Location = New System.Drawing.Point(4, 29)
+        Me.TabPageDestination.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPageDestination.Name = "TabPageDestination"
-        Me.TabPageDestination.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageDestination.Size = New System.Drawing.Size(797, 786)
+        Me.TabPageDestination.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.TabPageDestination.Size = New System.Drawing.Size(1200, 1216)
         Me.TabPageDestination.TabIndex = 2
         Me.TabPageDestination.Text = "Destination"
         Me.TabPageDestination.UseVisualStyleBackColor = True
         '
         'GroupBoxDestination
         '
+        Me.GroupBoxDestination.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxDestination.Controls.Add(Me.lblDestinationPWD)
+        Me.GroupBoxDestination.Controls.Add(Me.lblDestinationUID)
+        Me.GroupBoxDestination.Controls.Add(Me.txtDestinationPWD)
+        Me.GroupBoxDestination.Controls.Add(Me.txtDestinationUID)
         Me.GroupBoxDestination.Controls.Add(Me.rdbDestinationDSN)
         Me.GroupBoxDestination.Controls.Add(Me.rdbDestinationConnectionString)
         Me.GroupBoxDestination.Controls.Add(Me.txtDestinationConnectionString)
         Me.GroupBoxDestination.Controls.Add(Me.cmbDestinationDSN)
-        Me.GroupBoxDestination.Location = New System.Drawing.Point(27, 16)
+        Me.GroupBoxDestination.Location = New System.Drawing.Point(28, 23)
+        Me.GroupBoxDestination.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.GroupBoxDestination.Name = "GroupBoxDestination"
-        Me.GroupBoxDestination.Size = New System.Drawing.Size(682, 151)
+        Me.GroupBoxDestination.Padding = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.GroupBoxDestination.Size = New System.Drawing.Size(1150, 195)
         Me.GroupBoxDestination.TabIndex = 97
         Me.GroupBoxDestination.TabStop = False
         Me.GroupBoxDestination.Text = "Choose Destination"
+        '
+        'lblDestinationPWD
+        '
+        Me.lblDestinationPWD.AutoSize = True
+        Me.lblDestinationPWD.Location = New System.Drawing.Point(866, 30)
+        Me.lblDestinationPWD.Name = "lblDestinationPWD"
+        Me.lblDestinationPWD.Size = New System.Drawing.Size(148, 20)
+        Me.lblDestinationPWD.TabIndex = 112
+        Me.lblDestinationPWD.Text = "Password (optional)"
+        '
+        'lblDestinationUID
+        '
+        Me.lblDestinationUID.AutoSize = True
+        Me.lblDestinationUID.Location = New System.Drawing.Point(536, 30)
+        Me.lblDestinationUID.Name = "lblDestinationUID"
+        Me.lblDestinationUID.Size = New System.Drawing.Size(153, 20)
+        Me.lblDestinationUID.TabIndex = 111
+        Me.lblDestinationUID.Text = "Username (optional)"
+        '
+        'txtDestinationPWD
+        '
+        Me.txtDestinationPWD.Location = New System.Drawing.Point(870, 60)
+        Me.txtDestinationPWD.Name = "txtDestinationPWD"
+        Me.txtDestinationPWD.Size = New System.Drawing.Size(261, 26)
+        Me.txtDestinationPWD.TabIndex = 110
+        '
+        'txtDestinationUID
+        '
+        Me.txtDestinationUID.Location = New System.Drawing.Point(540, 60)
+        Me.txtDestinationUID.Name = "txtDestinationUID"
+        Me.txtDestinationUID.Size = New System.Drawing.Size(310, 26)
+        Me.txtDestinationUID.TabIndex = 109
         '
         'rdbDestinationDSN
         '
         Me.rdbDestinationDSN.AutoSize = True
         Me.rdbDestinationDSN.Checked = True
-        Me.rdbDestinationDSN.Location = New System.Drawing.Point(13, 21)
+        Me.rdbDestinationDSN.Location = New System.Drawing.Point(24, 26)
+        Me.rdbDestinationDSN.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.rdbDestinationDSN.Name = "rdbDestinationDSN"
-        Me.rdbDestinationDSN.Size = New System.Drawing.Size(48, 17)
+        Me.rdbDestinationDSN.Size = New System.Drawing.Size(61, 24)
         Me.rdbDestinationDSN.TabIndex = 108
         Me.rdbDestinationDSN.TabStop = True
         Me.rdbDestinationDSN.Text = "DSN"
@@ -338,50 +443,56 @@ Partial Class frmETL
         'rdbDestinationConnectionString
         '
         Me.rdbDestinationConnectionString.AutoSize = True
-        Me.rdbDestinationConnectionString.Location = New System.Drawing.Point(11, 81)
+        Me.rdbDestinationConnectionString.Location = New System.Drawing.Point(24, 109)
+        Me.rdbDestinationConnectionString.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.rdbDestinationConnectionString.Name = "rdbDestinationConnectionString"
-        Me.rdbDestinationConnectionString.Size = New System.Drawing.Size(143, 17)
+        Me.rdbDestinationConnectionString.Size = New System.Drawing.Size(204, 24)
         Me.rdbDestinationConnectionString.TabIndex = 107
         Me.rdbDestinationConnectionString.Text = "Enter a connection string"
         Me.rdbDestinationConnectionString.UseVisualStyleBackColor = True
         '
         'txtDestinationConnectionString
         '
+        Me.txtDestinationConnectionString.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDestinationConnectionString.Enabled = False
-        Me.txtDestinationConnectionString.Location = New System.Drawing.Point(9, 108)
-        Me.txtDestinationConnectionString.Margin = New System.Windows.Forms.Padding(2)
+        Me.txtDestinationConnectionString.Location = New System.Drawing.Point(24, 141)
         Me.txtDestinationConnectionString.Name = "txtDestinationConnectionString"
-        Me.txtDestinationConnectionString.Size = New System.Drawing.Size(644, 20)
+        Me.txtDestinationConnectionString.Size = New System.Drawing.Size(1119, 26)
         Me.txtDestinationConnectionString.TabIndex = 106
         '
         'cmbDestinationDSN
         '
         Me.cmbDestinationDSN.FormattingEnabled = True
-        Me.cmbDestinationDSN.Location = New System.Drawing.Point(8, 41)
+        Me.cmbDestinationDSN.Location = New System.Drawing.Point(24, 60)
+        Me.cmbDestinationDSN.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.cmbDestinationDSN.Name = "cmbDestinationDSN"
-        Me.cmbDestinationDSN.Size = New System.Drawing.Size(168, 21)
+        Me.cmbDestinationDSN.Size = New System.Drawing.Size(500, 28)
         Me.cmbDestinationDSN.TabIndex = 91
         '
         'lblDestinationTable
         '
         Me.lblDestinationTable.AutoSize = True
-        Me.lblDestinationTable.Location = New System.Drawing.Point(195, 203)
+        Me.lblDestinationTable.Location = New System.Drawing.Point(287, 247)
+        Me.lblDestinationTable.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lblDestinationTable.Name = "lblDestinationTable"
-        Me.lblDestinationTable.Size = New System.Drawing.Size(0, 13)
+        Me.lblDestinationTable.Size = New System.Drawing.Size(0, 20)
         Me.lblDestinationTable.TabIndex = 35
         '
         'TabPageMapping
         '
         Me.TabPageMapping.Controls.Add(Me.lblProgress)
+        Me.TabPageMapping.Controls.Add(Me.lblJobFile)
         Me.TabPageMapping.Controls.Add(Me.dgMapping)
         Me.TabPageMapping.Controls.Add(Me.ckbLogSQL)
         Me.TabPageMapping.Controls.Add(Me.btnImport)
         Me.TabPageMapping.Controls.Add(Me.btnLoad)
         Me.TabPageMapping.Controls.Add(Me.btnListFields)
         Me.TabPageMapping.Controls.Add(Me.btnSave)
-        Me.TabPageMapping.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageMapping.Location = New System.Drawing.Point(4, 29)
+        Me.TabPageMapping.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TabPageMapping.Name = "TabPageMapping"
-        Me.TabPageMapping.Size = New System.Drawing.Size(797, 786)
+        Me.TabPageMapping.Size = New System.Drawing.Size(1200, 1216)
         Me.TabPageMapping.TabIndex = 3
         Me.TabPageMapping.Text = "Column Mapping"
         Me.TabPageMapping.UseVisualStyleBackColor = True
@@ -389,20 +500,19 @@ Partial Class frmETL
         'lblProgress
         '
         Me.lblProgress.AutoSize = True
-        Me.lblProgress.Location = New System.Drawing.Point(662, 40)
-        Me.lblProgress.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblProgress.Location = New System.Drawing.Point(818, 36)
         Me.lblProgress.Name = "lblProgress"
-        Me.lblProgress.Size = New System.Drawing.Size(0, 13)
+        Me.lblProgress.Size = New System.Drawing.Size(0, 20)
         Me.lblProgress.TabIndex = 93
         '
         'frmETL
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(833, 842)
+        Me.ClientSize = New System.Drawing.Size(1250, 1295)
         Me.Controls.Add(Me.TabControl)
-        Me.Controls.Add(Me.lblJobFile)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmETL"
         Me.Text = "QuNect ETL"
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).EndInit()
@@ -418,7 +528,6 @@ Partial Class frmETL
         Me.TabPageMapping.ResumeLayout(False)
         Me.TabPageMapping.PerformLayout()
         Me.ResumeLayout(False)
-        Me.PerformLayout()
 
     End Sub
     Friend WithEvents dgMapping As System.Windows.Forms.DataGridView
@@ -452,4 +561,12 @@ Partial Class frmETL
     Friend WithEvents rdbDestinationConnectionString As RadioButton
     Friend WithEvents txtDestinationConnectionString As TextBox
     Friend WithEvents rdbDestinationDSN As RadioButton
+    Friend WithEvents txtSourcePWD As TextBox
+    Friend WithEvents txtSourceUID As TextBox
+    Friend WithEvents lblSourcePWD As Label
+    Friend WithEvents lblSourceUID As Label
+    Friend WithEvents lblDestinationPWD As Label
+    Friend WithEvents lblDestinationUID As Label
+    Friend WithEvents txtDestinationPWD As TextBox
+    Friend WithEvents txtDestinationUID As TextBox
 End Class

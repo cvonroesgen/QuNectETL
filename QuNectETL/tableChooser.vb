@@ -3,16 +3,7 @@
     Private Sub tvAppsTables_DoubleClick(sender As Object, e As EventArgs) Handles tvAppsTables.DoubleClick
         btnDone_Click(sender, e)
     End Sub
-    Private Sub tvAppsTables_Click(sender As Object, e As EventArgs) Handles tvAppsTables.Click
-        If tvAppsTables.SelectedNode Is Nothing Then
-            Exit Sub
-        End If
-        If tvAppsTables.SelectedNode.Level <> 1 Then
-            Exit Sub
-        End If
-        frmETL.lblDestinationTable.Text = tvAppsTables.SelectedNode.FullPath()
-        hideButtons()
-    End Sub
+
 
     Private Sub btnDone_Click(sender As Object, e As EventArgs) Handles btnDone.Click
         If tvAppsTables.SelectedNode Is Nothing Then
@@ -23,7 +14,17 @@
 
         If tvAppsTables.SelectedNode.Level = 1 Then
             If frmETL.TabControl.SelectedTab.Name = "TabPageSource" Then
-                frmETL.txtSQL.Text = "SELECT * FROM """ & tvAppsTables.SelectedNode.Text() & """"
+                Dim sourceColumns As DataTable = frmETL.getColumnsDataTable("SELECT * FROM """ & tvAppsTables.SelectedNode.Text() & """", frmETL.txtSourceConnectionString.Text)
+                If sourceColumns Is Nothing Then
+                    Return
+                End If
+                frmETL.txtSQL.Text = "SELECT "
+                Dim comma As String = ""
+                For Each columnRow As DataRow In sourceColumns.Rows
+                    frmETL.txtSQL.Text &= comma & """" & columnRow(0) & """"
+                    comma = ","
+                Next
+                frmETL.txtSQL.Text &= " FROM """ & tvAppsTables.SelectedNode.Text() & """"
             Else
                 frmETL.lblDestinationTable.Text = tvAppsTables.SelectedNode.Text()
             End If
