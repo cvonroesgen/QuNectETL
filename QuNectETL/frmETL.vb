@@ -679,6 +679,7 @@ Public Class frmETL
             Alert("Please choose enter a connection string.")
             Return
         End If
+        showHideControls()
         listTables(txtDestinationConnectionString.Text)
     End Sub
 
@@ -945,10 +946,13 @@ Public Class frmETL
             Alert("Please choose a DSN.")
             Return
         End If
-        If txtSourceConnectionString.Text.Length = 0 And rdbSourceConnectionString.Checked Then
-            Alert("Please choose enter a connection string.")
-            Return
+        If txtSourceConnectionString.Text.Length = 0 Then
+            If rdbSourceConnectionString.Checked Then
+                Alert("Please enter a connection string.")
+                Return
+            End If
         End If
+        showHideControls()
         listTables(txtSourceConnectionString.Text)
 
     End Sub
