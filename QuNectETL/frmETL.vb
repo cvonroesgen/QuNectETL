@@ -694,6 +694,7 @@ Public Class frmETL
 
         Catch ex As Exception
             Alert("Could not list tables because " & ex.Message)
+            Me.Cursor = Cursors.Default
         End Try
     End Sub
 
