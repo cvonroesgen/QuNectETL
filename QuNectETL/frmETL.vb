@@ -138,7 +138,13 @@ Public Class frmETL
         txtDestinationPWD.Text = GetSetting(AppName, "Credentials", "destinationPWD", "")
         GetDSNs()
         cmbSourceDSN.SelectedIndex = cmbSourceDSN.FindStringExact(sourceDSN)
+        If cmbSourceDSN.SelectedIndex = -1 Then
+            cmbSourceDSN.SelectedIndex = 0
+        End If
         cmbDestinationDSN.SelectedIndex = cmbDestinationDSN.FindStringExact(destinationDSN)
+        If cmbDestinationDSN.SelectedIndex = -1 Then
+            cmbDestinationDSN.SelectedIndex = 0
+        End If
         txtSourceConnectionString.Text = GetSetting(AppName, "Connection", "sourceConnectionString", "")
         If txtSourceConnectionString.Text <> "" Then
             rdbSourceConnectionString.Checked = True
@@ -671,13 +677,16 @@ Public Class frmETL
         Return odbcConn
     End Function
     Private Sub btnDestination_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDestination.Click
-        If cmbDestinationDSN.SelectedIndex = 0 And rdbDestinationDSN.Checked Then
+        If cmbDestinationDSN.SelectedIndex <= 0 And rdbDestinationDSN.Checked Then
             Alert("Please choose a DSN.")
             Return
         End If
         If txtDestinationConnectionString.Text.Length = 0 And rdbDestinationConnectionString.Checked Then
-            Alert("Please choose enter a connection string.")
+            Alert("Please enter a connection string.")
             Return
+        End If
+        If rdbDestinationDSN.Checked Then
+            txtDestinationConnectionString.Text = "DSN=" & cmbDestinationDSN.Text & ";"
         End If
         showHideControls()
         listTables(txtDestinationConnectionString.Text)
@@ -943,15 +952,16 @@ Public Class frmETL
     End Sub
 
     Private Sub btnSourceTable_Click(sender As Object, e As EventArgs) Handles btnSourceTable.Click
-        If cmbSourceDSN.SelectedIndex = 0 And rdbSourceDSN.Checked Then
+        If cmbSourceDSN.SelectedIndex <= 0 And rdbSourceDSN.Checked Then
             Alert("Please choose a DSN.")
             Return
         End If
-        If txtSourceConnectionString.Text.Length = 0 Then
-            If rdbSourceConnectionString.Checked Then
-                Alert("Please enter a connection string.")
-                Return
-            End If
+        If txtSourceConnectionString.Text.Length = 0 And rdbSourceConnectionString.Checked Then
+            Alert("Please enter a connection string.")
+            Return
+        End If
+        If rdbSourceDSN.Checked Then
+            txtSourceConnectionString.Text = "DSN=" & cmbSourceDSN.Text & ";"
         End If
         showHideControls()
         listTables(txtSourceConnectionString.Text)
