@@ -65,6 +65,7 @@ Partial Class frmETL
         Me.lblDestinationTable = New System.Windows.Forms.Label()
         Me.TabPageMapping = New System.Windows.Forms.TabPage()
         Me.lblProgress = New System.Windows.Forms.Label()
+        Me.btnPreview = New System.Windows.Forms.Button()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl.SuspendLayout()
         Me.TabPageSource.SuspendLayout()
@@ -156,7 +157,7 @@ Partial Class frmETL
         'btnSave
         '
         Me.btnSave.Location = New System.Drawing.Point(264, 16)
-        Me.btnSave.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(65, 27)
         Me.btnSave.TabIndex = 85
@@ -166,7 +167,7 @@ Partial Class frmETL
         'btnLoad
         '
         Me.btnLoad.Location = New System.Drawing.Point(107, 18)
-        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2)
         Me.btnLoad.Name = "btnLoad"
         Me.btnLoad.Size = New System.Drawing.Size(71, 26)
         Me.btnLoad.TabIndex = 86
@@ -216,7 +217,7 @@ Partial Class frmETL
         Me.TabPageSource.Controls.Add(Me.GroupBoxSource)
         Me.TabPageSource.Location = New System.Drawing.Point(4, 22)
         Me.TabPageSource.Name = "TabPageSource"
-        Me.TabPageSource.Padding = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.TabPageSource.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPageSource.Size = New System.Drawing.Size(810, 729)
         Me.TabPageSource.TabIndex = 1
         Me.TabPageSource.Text = "Source"
@@ -227,6 +228,7 @@ Partial Class frmETL
         Me.GroupBoxSQL.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxSQL.Controls.Add(Me.btnPreview)
         Me.GroupBoxSQL.Controls.Add(Me.btnSourceTable)
         Me.GroupBoxSQL.Controls.Add(Me.txtSQL)
         Me.GroupBoxSQL.Location = New System.Drawing.Point(19, 154)
@@ -278,7 +280,7 @@ Partial Class frmETL
         'txtSourcePWD
         '
         Me.txtSourcePWD.Location = New System.Drawing.Point(580, 39)
-        Me.txtSourcePWD.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.txtSourcePWD.Margin = New System.Windows.Forms.Padding(2)
         Me.txtSourcePWD.Name = "txtSourcePWD"
         Me.txtSourcePWD.Size = New System.Drawing.Size(175, 20)
         Me.txtSourcePWD.TabIndex = 116
@@ -286,7 +288,7 @@ Partial Class frmETL
         'txtSourceUID
         '
         Me.txtSourceUID.Location = New System.Drawing.Point(360, 39)
-        Me.txtSourceUID.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.txtSourceUID.Margin = New System.Windows.Forms.Padding(2)
         Me.txtSourceUID.Name = "txtSourceUID"
         Me.txtSourceUID.Size = New System.Drawing.Size(208, 20)
         Me.txtSourceUID.TabIndex = 115
@@ -339,7 +341,7 @@ Partial Class frmETL
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtSourceConnectionString.Enabled = False
         Me.txtSourceConnectionString.Location = New System.Drawing.Point(16, 92)
-        Me.txtSourceConnectionString.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.txtSourceConnectionString.Margin = New System.Windows.Forms.Padding(2)
         Me.txtSourceConnectionString.Name = "txtSourceConnectionString"
         Me.txtSourceConnectionString.Size = New System.Drawing.Size(760, 20)
         Me.txtSourceConnectionString.TabIndex = 103
@@ -359,7 +361,7 @@ Partial Class frmETL
         Me.TabPageDestination.Controls.Add(Me.lblDestinationTable)
         Me.TabPageDestination.Location = New System.Drawing.Point(4, 22)
         Me.TabPageDestination.Name = "TabPageDestination"
-        Me.TabPageDestination.Padding = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        Me.TabPageDestination.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPageDestination.Size = New System.Drawing.Size(810, 729)
         Me.TabPageDestination.TabIndex = 2
         Me.TabPageDestination.Text = "Destination"
@@ -407,7 +409,7 @@ Partial Class frmETL
         'txtDestinationPWD
         '
         Me.txtDestinationPWD.Location = New System.Drawing.Point(580, 39)
-        Me.txtDestinationPWD.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.txtDestinationPWD.Margin = New System.Windows.Forms.Padding(2)
         Me.txtDestinationPWD.Name = "txtDestinationPWD"
         Me.txtDestinationPWD.Size = New System.Drawing.Size(175, 20)
         Me.txtDestinationPWD.TabIndex = 110
@@ -415,7 +417,7 @@ Partial Class frmETL
         'txtDestinationUID
         '
         Me.txtDestinationUID.Location = New System.Drawing.Point(360, 39)
-        Me.txtDestinationUID.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.txtDestinationUID.Margin = New System.Windows.Forms.Padding(2)
         Me.txtDestinationUID.Name = "txtDestinationUID"
         Me.txtDestinationUID.Size = New System.Drawing.Size(208, 20)
         Me.txtDestinationUID.TabIndex = 109
@@ -448,7 +450,7 @@ Partial Class frmETL
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDestinationConnectionString.Enabled = False
         Me.txtDestinationConnectionString.Location = New System.Drawing.Point(16, 92)
-        Me.txtDestinationConnectionString.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.txtDestinationConnectionString.Margin = New System.Windows.Forms.Padding(2)
         Me.txtDestinationConnectionString.Name = "txtDestinationConnectionString"
         Me.txtDestinationConnectionString.Size = New System.Drawing.Size(760, 20)
         Me.txtDestinationConnectionString.TabIndex = 106
@@ -494,6 +496,15 @@ Partial Class frmETL
         Me.lblProgress.Name = "lblProgress"
         Me.lblProgress.Size = New System.Drawing.Size(0, 13)
         Me.lblProgress.TabIndex = 93
+        '
+        'btnPreview
+        '
+        Me.btnPreview.Location = New System.Drawing.Point(609, 29)
+        Me.btnPreview.Name = "btnPreview"
+        Me.btnPreview.Size = New System.Drawing.Size(145, 25)
+        Me.btnPreview.TabIndex = 97
+        Me.btnPreview.Text = "Preview"
+        Me.btnPreview.UseVisualStyleBackColor = True
         '
         'frmETL
         '
@@ -558,4 +569,5 @@ Partial Class frmETL
     Friend WithEvents lblDestinationUID As Label
     Friend WithEvents txtDestinationPWD As TextBox
     Friend WithEvents txtDestinationUID As TextBox
+    Friend WithEvents btnPreview As Button
 End Class

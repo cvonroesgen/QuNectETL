@@ -1028,6 +1028,12 @@ Public Class frmETL
     Private Sub txtSourceUID_TextChanged(sender As Object, e As EventArgs) Handles txtSourceUID.TextChanged
         showHideControls()
     End Sub
+
+    Private Sub btnPreview_Click(sender As Object, e As EventArgs) Handles btnPreview.Click
+        frmPreview.sql = txtSQL.Text
+        frmPreview.connectionString = txtSourceConnectionString.Text
+        frmPreview.ShowDialog()
+    End Sub
 End Class
 
 
