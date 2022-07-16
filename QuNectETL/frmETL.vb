@@ -1030,10 +1030,14 @@ Public Class frmETL
     End Sub
 
     Private Sub btnPreview_Click(sender As Object, e As EventArgs) Handles btnPreview.Click
+        Me.Cursor = Cursors.WaitCursor
         frmPreview.sql = txtSQL.Text
         frmPreview.connectionString = txtSourceConnectionString.Text
         frmPreview.ShowDialog()
+        Me.Cursor = Cursors.Default
     End Sub
+
+
 End Class
 
 

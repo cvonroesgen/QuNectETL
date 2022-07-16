@@ -41,6 +41,9 @@ Partial Class frmETL
         Me.TabControl = New System.Windows.Forms.TabControl()
         Me.TabPageSource = New System.Windows.Forms.TabPage()
         Me.GroupBoxSQL = New System.Windows.Forms.GroupBox()
+        Me.lblPreview = New System.Windows.Forms.Label()
+        Me.nudPreview = New System.Windows.Forms.NumericUpDown()
+        Me.btnPreview = New System.Windows.Forms.Button()
         Me.btnSourceTable = New System.Windows.Forms.Button()
         Me.txtSQL = New System.Windows.Forms.RichTextBox()
         Me.GroupBoxSource = New System.Windows.Forms.GroupBox()
@@ -65,11 +68,11 @@ Partial Class frmETL
         Me.lblDestinationTable = New System.Windows.Forms.Label()
         Me.TabPageMapping = New System.Windows.Forms.TabPage()
         Me.lblProgress = New System.Windows.Forms.Label()
-        Me.btnPreview = New System.Windows.Forms.Button()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl.SuspendLayout()
         Me.TabPageSource.SuspendLayout()
         Me.GroupBoxSQL.SuspendLayout()
+        CType(Me.nudPreview, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBoxSource.SuspendLayout()
         Me.TabPageDestination.SuspendLayout()
         Me.GroupBoxDestination.SuspendLayout()
@@ -228,6 +231,8 @@ Partial Class frmETL
         Me.GroupBoxSQL.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxSQL.Controls.Add(Me.lblPreview)
+        Me.GroupBoxSQL.Controls.Add(Me.nudPreview)
         Me.GroupBoxSQL.Controls.Add(Me.btnPreview)
         Me.GroupBoxSQL.Controls.Add(Me.btnSourceTable)
         Me.GroupBoxSQL.Controls.Add(Me.txtSQL)
@@ -237,6 +242,32 @@ Partial Class frmETL
         Me.GroupBoxSQL.TabIndex = 107
         Me.GroupBoxSQL.TabStop = False
         Me.GroupBoxSQL.Text = "Table or SQL Statement"
+        '
+        'lblPreview
+        '
+        Me.lblPreview.AutoSize = True
+        Me.lblPreview.Location = New System.Drawing.Point(729, 33)
+        Me.lblPreview.Name = "lblPreview"
+        Me.lblPreview.Size = New System.Drawing.Size(29, 13)
+        Me.lblPreview.TabIndex = 99
+        Me.lblPreview.Text = "rows"
+        '
+        'nudPreview
+        '
+        Me.nudPreview.Location = New System.Drawing.Point(682, 32)
+        Me.nudPreview.Name = "nudPreview"
+        Me.nudPreview.Size = New System.Drawing.Size(38, 20)
+        Me.nudPreview.TabIndex = 98
+        Me.nudPreview.Value = New Decimal(New Integer() {10, 0, 0, 0})
+        '
+        'btnPreview
+        '
+        Me.btnPreview.Location = New System.Drawing.Point(609, 29)
+        Me.btnPreview.Name = "btnPreview"
+        Me.btnPreview.Size = New System.Drawing.Size(67, 25)
+        Me.btnPreview.TabIndex = 97
+        Me.btnPreview.Text = "Preview"
+        Me.btnPreview.UseVisualStyleBackColor = True
         '
         'btnSourceTable
         '
@@ -497,15 +528,6 @@ Partial Class frmETL
         Me.lblProgress.Size = New System.Drawing.Size(0, 13)
         Me.lblProgress.TabIndex = 93
         '
-        'btnPreview
-        '
-        Me.btnPreview.Location = New System.Drawing.Point(609, 29)
-        Me.btnPreview.Name = "btnPreview"
-        Me.btnPreview.Size = New System.Drawing.Size(145, 25)
-        Me.btnPreview.TabIndex = 97
-        Me.btnPreview.Text = "Preview"
-        Me.btnPreview.UseVisualStyleBackColor = True
-        '
         'frmETL
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -519,6 +541,8 @@ Partial Class frmETL
         Me.TabControl.ResumeLayout(False)
         Me.TabPageSource.ResumeLayout(False)
         Me.GroupBoxSQL.ResumeLayout(False)
+        Me.GroupBoxSQL.PerformLayout()
+        CType(Me.nudPreview, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBoxSource.ResumeLayout(False)
         Me.GroupBoxSource.PerformLayout()
         Me.TabPageDestination.ResumeLayout(False)
@@ -570,4 +594,6 @@ Partial Class frmETL
     Friend WithEvents txtDestinationPWD As TextBox
     Friend WithEvents txtDestinationUID As TextBox
     Friend WithEvents btnPreview As Button
+    Friend WithEvents lblPreview As Label
+    Friend WithEvents nudPreview As NumericUpDown
 End Class

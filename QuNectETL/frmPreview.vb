@@ -50,12 +50,11 @@ Public Class frmPreview
                         r = tblPreview.NewRow()
                         For i As Integer = 0 To dr.FieldCount - 1
                             r(i) = dr.GetValue(i)
-
                         Next
                         'Add the row to the tabledata
                         tblPreview.Rows.Add(r)
                         recordCounter += 1
-                        If recordCounter > 10 Then
+                        If recordCounter >= frmETL.nudPreview.Value Then
                             Exit While
                         End If
                     End While
@@ -64,12 +63,14 @@ Public Class frmPreview
                     srcCmd.Cancel()
                     srcCmd.Dispose()
                     srcConnection.Close()
+                    Me.Cursor = Cursors.Default
                     Throw New System.Exception("Could not get preview records from " & mSQL & vbCrLf & excpt.Message)
                 End Try
             End Using
             dgvPreview.DataSource = tblPreview
         Catch ex As Exception
-            MsgBox("Could not copy because " & ex.Message)
+            MsgBox("Could not preview because " & ex.Message)
+            Me.Cursor = Cursors.Default
         Finally
 
         End Try
