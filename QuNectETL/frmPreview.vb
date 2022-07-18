@@ -39,7 +39,7 @@ Public Class frmPreview
                         col.ColumnName = dr.GetName(i)
                         'This value will be displayed in the header of the column
                         col.Caption = dr.GetName(i)
-                        'This will make this column read only,Since it is autoincrement
+                        'This will make this column read only
                         col.ReadOnly = True
                         tblPreview.Columns.Add(col)
                     Next
@@ -60,19 +60,21 @@ Public Class frmPreview
                     End While
 
                 Catch excpt As Exception
+
+                    Me.Cursor = Cursors.Default
+                    Throw New System.Exception("Could not get preview records from " & mSQL & vbCrLf & excpt.Message)
+                Finally
                     srcCmd.Cancel()
                     srcCmd.Dispose()
                     srcConnection.Close()
-                    Me.Cursor = Cursors.Default
-                    Throw New System.Exception("Could not get preview records from " & mSQL & vbCrLf & excpt.Message)
                 End Try
             End Using
             dgvPreview.DataSource = tblPreview
         Catch ex As Exception
             MsgBox("Could not preview because " & ex.Message)
-            Me.Cursor = Cursors.Default
+            Me.Close()
         Finally
-
+            Me.Cursor = Cursors.Default
         End Try
 
     End Sub
