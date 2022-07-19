@@ -1037,7 +1037,17 @@ Public Class frmETL
         Me.Cursor = Cursors.Default
     End Sub
 
-
+    Private Sub btnPreviewDestination_Click(sender As Object, e As EventArgs) Handles btnPreviewDestination.Click
+        If lblDestinationTable.Text = "" Then
+            Alert("Please choose a destination table first.")
+            Exit Sub
+        End If
+        Me.Cursor = Cursors.WaitCursor
+        frmPreview.sql = "SELECT * FROM """ & lblDestinationTable.Text & """"
+        frmPreview.connectionString = txtDestinationConnectionString.Text
+        frmPreview.ShowDialog()
+        Me.Cursor = Cursors.Default
+    End Sub
 End Class
 
 

@@ -41,6 +41,7 @@ Partial Class frmETL
         Me.TabControl = New System.Windows.Forms.TabControl()
         Me.TabPageSource = New System.Windows.Forms.TabPage()
         Me.GroupBoxSQL = New System.Windows.Forms.GroupBox()
+        Me.lblSourceTable = New System.Windows.Forms.Label()
         Me.lblPreview = New System.Windows.Forms.Label()
         Me.nudPreview = New System.Windows.Forms.NumericUpDown()
         Me.btnPreview = New System.Windows.Forms.Button()
@@ -56,6 +57,9 @@ Partial Class frmETL
         Me.txtSourceConnectionString = New System.Windows.Forms.TextBox()
         Me.cmbSourceDSN = New System.Windows.Forms.ComboBox()
         Me.TabPageDestination = New System.Windows.Forms.TabPage()
+        Me.lblDestinationRows = New System.Windows.Forms.Label()
+        Me.nudDestination = New System.Windows.Forms.NumericUpDown()
+        Me.btnPreviewDestination = New System.Windows.Forms.Button()
         Me.GroupBoxDestination = New System.Windows.Forms.GroupBox()
         Me.lblDestinationPWD = New System.Windows.Forms.Label()
         Me.lblDestinationUID = New System.Windows.Forms.Label()
@@ -75,6 +79,7 @@ Partial Class frmETL
         CType(Me.nudPreview, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBoxSource.SuspendLayout()
         Me.TabPageDestination.SuspendLayout()
+        CType(Me.nudDestination, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBoxDestination.SuspendLayout()
         Me.TabPageMapping.SuspendLayout()
         Me.SuspendLayout()
@@ -231,6 +236,7 @@ Partial Class frmETL
         Me.GroupBoxSQL.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxSQL.Controls.Add(Me.lblSourceTable)
         Me.GroupBoxSQL.Controls.Add(Me.lblPreview)
         Me.GroupBoxSQL.Controls.Add(Me.nudPreview)
         Me.GroupBoxSQL.Controls.Add(Me.btnPreview)
@@ -242,6 +248,14 @@ Partial Class frmETL
         Me.GroupBoxSQL.TabIndex = 107
         Me.GroupBoxSQL.TabStop = False
         Me.GroupBoxSQL.Text = "Table or SQL Statement"
+        '
+        'lblSourceTable
+        '
+        Me.lblSourceTable.AutoSize = True
+        Me.lblSourceTable.Location = New System.Drawing.Point(192, 35)
+        Me.lblSourceTable.Name = "lblSourceTable"
+        Me.lblSourceTable.Size = New System.Drawing.Size(0, 13)
+        Me.lblSourceTable.TabIndex = 100
         '
         'lblPreview
         '
@@ -315,6 +329,7 @@ Partial Class frmETL
         Me.txtSourcePWD.Name = "txtSourcePWD"
         Me.txtSourcePWD.Size = New System.Drawing.Size(175, 20)
         Me.txtSourcePWD.TabIndex = 116
+        Me.txtSourcePWD.UseSystemPasswordChar = True
         '
         'txtSourceUID
         '
@@ -387,6 +402,9 @@ Partial Class frmETL
         '
         'TabPageDestination
         '
+        Me.TabPageDestination.Controls.Add(Me.lblDestinationRows)
+        Me.TabPageDestination.Controls.Add(Me.nudDestination)
+        Me.TabPageDestination.Controls.Add(Me.btnPreviewDestination)
         Me.TabPageDestination.Controls.Add(Me.GroupBoxDestination)
         Me.TabPageDestination.Controls.Add(Me.btnDestination)
         Me.TabPageDestination.Controls.Add(Me.lblDestinationTable)
@@ -397,6 +415,32 @@ Partial Class frmETL
         Me.TabPageDestination.TabIndex = 2
         Me.TabPageDestination.Text = "Destination"
         Me.TabPageDestination.UseVisualStyleBackColor = True
+        '
+        'lblDestinationRows
+        '
+        Me.lblDestinationRows.AutoSize = True
+        Me.lblDestinationRows.Location = New System.Drawing.Point(767, 159)
+        Me.lblDestinationRows.Name = "lblDestinationRows"
+        Me.lblDestinationRows.Size = New System.Drawing.Size(29, 13)
+        Me.lblDestinationRows.TabIndex = 102
+        Me.lblDestinationRows.Text = "rows"
+        '
+        'nudDestination
+        '
+        Me.nudDestination.Location = New System.Drawing.Point(720, 158)
+        Me.nudDestination.Name = "nudDestination"
+        Me.nudDestination.Size = New System.Drawing.Size(38, 20)
+        Me.nudDestination.TabIndex = 101
+        Me.nudDestination.Value = New Decimal(New Integer() {10, 0, 0, 0})
+        '
+        'btnPreviewDestination
+        '
+        Me.btnPreviewDestination.Location = New System.Drawing.Point(647, 155)
+        Me.btnPreviewDestination.Name = "btnPreviewDestination"
+        Me.btnPreviewDestination.Size = New System.Drawing.Size(67, 25)
+        Me.btnPreviewDestination.TabIndex = 100
+        Me.btnPreviewDestination.Text = "Preview"
+        Me.btnPreviewDestination.UseVisualStyleBackColor = True
         '
         'GroupBoxDestination
         '
@@ -444,6 +488,7 @@ Partial Class frmETL
         Me.txtDestinationPWD.Name = "txtDestinationPWD"
         Me.txtDestinationPWD.Size = New System.Drawing.Size(175, 20)
         Me.txtDestinationPWD.TabIndex = 110
+        Me.txtDestinationPWD.UseSystemPasswordChar = True
         '
         'txtDestinationUID
         '
@@ -547,6 +592,7 @@ Partial Class frmETL
         Me.GroupBoxSource.PerformLayout()
         Me.TabPageDestination.ResumeLayout(False)
         Me.TabPageDestination.PerformLayout()
+        CType(Me.nudDestination, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBoxDestination.ResumeLayout(False)
         Me.GroupBoxDestination.PerformLayout()
         Me.TabPageMapping.ResumeLayout(False)
@@ -596,4 +642,8 @@ Partial Class frmETL
     Friend WithEvents btnPreview As Button
     Friend WithEvents lblPreview As Label
     Friend WithEvents nudPreview As NumericUpDown
+    Friend WithEvents lblSourceTable As Label
+    Friend WithEvents lblDestinationRows As Label
+    Friend WithEvents nudDestination As NumericUpDown
+    Friend WithEvents btnPreviewDestination As Button
 End Class

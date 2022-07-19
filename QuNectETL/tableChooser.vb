@@ -25,12 +25,14 @@
                     comma = ","
                 Next
                 frmETL.txtSQL.Text &= " FROM """ & tvAppsTables.SelectedNode.Text() & """"
+                frmETL.lblSourceTable.Text = tvAppsTables.SelectedNode.Text()
             Else
                 frmETL.lblDestinationTable.Text = tvAppsTables.SelectedNode.Text()
             End If
         Else
             If frmETL.TabControl.SelectedTab.Name <> "TabPageSource" Then
                 frmETL.lblDestinationTable.Text = ""
+                frmETL.lblSourceTable.Text = ""
             End If
         End If
         hideButtons()
