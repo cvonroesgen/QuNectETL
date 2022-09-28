@@ -446,6 +446,7 @@ Public Class frmETL
             My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False, Encoding.ASCII)
         End If
         lblJobFile.Text = saveDialog.FileName
+        showHideControls()
         Me.Cursor = Cursors.Default
     End Sub
     Function createJSONString(ByRef name As String, ByRef value As String, comma As Boolean) As String
