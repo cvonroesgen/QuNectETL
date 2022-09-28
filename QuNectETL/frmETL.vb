@@ -1,8 +1,10 @@
 ﻿Imports System.Data.Odbc
 Imports System.IO
+Imports System.Reflection
+Imports System.Text
 Imports System.Text.RegularExpressions
 Imports System.Threading
-Imports Newtonsoft.Json
+
 
 Public Class frmETL
     Private Structure connectionStrings
@@ -36,6 +38,112 @@ Public Class frmETL
              "destination: " & destinationTable & vbCrLf &
              "destination fields: " & destinationFields.ToString() & vbCrLf &
              "sourceFieldOrdinals: " & sourceFieldOrdinals.ToString() & vbCrLf
+        End Function
+        Public Sub loadFromJSON(ByRef json As String)
+            jsonPointer = 0
+            Dim prop As String
+            Dim val As Object
+            Dim propValues As New Hashtable
+            goToFirstProperty(json)
+            While jsonPointer < json.Length And json.Chars(jsonPointer) <> "}"
+                prop = getPropertyName(json)
+                val = getPropertyValue(json)
+                propValues.Add(prop, val)
+                skipWhiteSpace(json)
+                If json.Chars(jsonPointer) = "," Then
+                    jsonPointer += 1 'skip over comma
+                    skipWhiteSpace(json)
+                End If
+            End While
+
+            Me.sourceFieldOrdinals = propValues("sourceFieldOrdinals")
+            Me.destinationFields = propValues("destinationFields")
+            Me.sourceSQL = propValues("sourceSQL")
+            Me.destinationConnectionString = propValues("destinationConnectionString")
+            Me.destinationTable = propValues("destinationTable")
+            Me.logSQL = propValues("logSQL")
+            Me.sourceConnectionString = propValues("sourceConnectionString")
+        End Sub
+
+        Private jsonPointer As Integer
+        Private Sub goToFirstProperty(ByRef json As String)
+            While jsonPointer < json.Length And json.Chars(jsonPointer) <> """"
+                jsonPointer += 1
+            End While
+        End Sub
+        Private Function getPropertyName(ByRef json As String) As String
+            getPropertyName = ""
+            If json.Chars(jsonPointer) <> """" Then
+                Throw New Exception("Missing opening double quote on property name." & json.Substring(jsonPointer))
+            End If
+            jsonPointer += 1
+            While jsonPointer < json.Length And json.Chars(jsonPointer) <> """"
+                getPropertyName &= json.Chars(jsonPointer)
+                jsonPointer += 1
+            End While
+            While jsonPointer < json.Length And json.Chars(jsonPointer) <> ":"
+                jsonPointer += 1
+            End While
+            jsonPointer += 1 'skip over colon
+        End Function
+        Private Function getPropertyValue(ByRef json As String) As Object
+            getPropertyValue = Nothing
+            skipWhiteSpace(json)
+            If json.Chars(jsonPointer) = "[" Then
+                getPropertyValue = New ArrayList
+                jsonPointer += 1 'skip over opening square bracket
+                skipWhiteSpace(json)
+                While json.Chars(jsonPointer) <> "]"
+                    skipWhiteSpace(json)
+                    getPropertyValue.add(getJSONString(json))
+                    skipWhiteSpace(json)
+                    If json.Chars(jsonPointer) = "]" Then Exit While
+                    If json.Chars(jsonPointer) <> "," Then
+                        Throw New Exception("Missing comma in array." & json.Substring(jsonPointer))
+                    End If
+                    jsonPointer += 1 'skip over comma
+                End While
+                jsonPointer += 1 'skip over closing square bracket
+            ElseIf json.Chars(jsonPointer) = """" Then
+                getPropertyValue = getJSONString(json)
+            Else
+                Dim token = getJSONToken(json)
+                If Regex.IsMatch(token, "^true$", RegexOptions.IgnoreCase) Then
+                    getPropertyValue = True
+                ElseIf Regex.IsMatch(token, "^false$", RegexOptions.IgnoreCase) Then
+                    getPropertyValue = False
+                Else
+                    getPropertyValue = Convert.ToDecimal(token)
+                End If
+            End If
+        End Function
+        Private Sub skipWhiteSpace(ByRef json As String)
+            While jsonPointer < json.Length And String.IsNullOrWhiteSpace(json.Chars(jsonPointer))
+                jsonPointer += 1
+            End While
+        End Sub
+        Private Function getJSONString(ByRef json As String) As String
+            getJSONString = ""
+            If json.Chars(jsonPointer) <> """" Then
+                Throw New Exception("Missing opening double quote on property name. " & json.Substring(jsonPointer))
+            End If
+            jsonPointer += 1 'skip over opening double quote
+            While jsonPointer < json.Length And json.Chars(jsonPointer) <> """"
+                If json.Chars(jsonPointer) = "\" And json.Chars(jsonPointer + 1) = """" Then
+                    jsonPointer += 1
+                End If
+                getJSONString &= json.Chars(jsonPointer)
+                jsonPointer += 1
+            End While
+            jsonPointer += 1 'skip over closing double quote
+        End Function
+        Private Function getJSONToken(ByRef json As String) As String
+            getJSONToken = ""
+            While jsonPointer < json.Length AndAlso Regex.IsMatch(json.Chars(jsonPointer), "[\\d\\-\\.a-z]", RegexOptions.IgnoreCase)
+                getJSONToken &= json.Chars(jsonPointer)
+                jsonPointer += 1
+            End While
+
         End Function
     End Structure
 
@@ -325,17 +433,49 @@ Public Class frmETL
         saveDialog.Filter = "JOB Files (*.job)|*.job"
         saveDialog.FileName = lblJobFile.Text
         If saveDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
-            Dim strJob As String = JsonConvert.SerializeObject(cnfg, Formatting.Indented)
-            My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False)
+            Dim strJob As String = createJSONString("sourceConnectionString", cnfg.sourceConnectionString, False)
+            strJob &= createJSONString("sourceSQL", cnfg.sourceSQL, True)
+            strJob &= createJSONArray("sourceFieldOrdinals", cnfg.sourceFieldOrdinals, True)
+            strJob &= createJSONString("destinationConnectionString", cnfg.destinationConnectionString, True)
+            strJob &= createJSONString("destinationTable", cnfg.destinationTable, True)
+            strJob &= createJSONArray("destinationFields", cnfg.destinationFields, True)
+            strJob &= createJSONBoolean("logSQL", cnfg.logSQL, True)
+            My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False, Encoding.ASCII)
         End If
         lblJobFile.Text = saveDialog.FileName
         Me.Cursor = Cursors.Default
     End Sub
+    Function createJSONString(ByRef name As String, ByRef value As String, comma As Boolean) As String
+        createJSONString = "{""" & name & """:""" & Replace(value, """", "\\""") & """"
+        If comma Then
+            createJSONString = "," & createJSONString
+        End If
+    End Function
+    Function createJSONBoolean(ByRef name As String, bool As Boolean, comma As Boolean) As String
+        Dim value As String = "false"
+        If bool Then value = "true"
+        createJSONBoolean = "{""" & name & """:""" & value & """"
+        If comma Then
+            createJSONBoolean = "," & createJSONBoolean
+        End If
+    End Function
+    Function createJSONArray(ByRef name As String, ByRef ary As ArrayList, notfirst As Boolean) As String
+        Dim strArray As String = ""
+        Dim comma As String = ""
+        For Each val As String In ary
+            strArray = comma & """" & Replace(val, """", "\\""") & """"
+            comma = ","
+        Next
+        createJSONArray = "{""" & name & """:[" & strArray & "]"
+        If notfirst Then
+            createJSONArray = "," & createJSONArray
+        End If
+    End Function
     Sub loadJsonFile(json As String, jobFileReader As System.IO.StreamReader)
         While Not jobFileReader.EndOfStream
             json &= jobFileReader.ReadLine
         End While
-        cnfg = JsonConvert.DeserializeObject(Of config)(json)
+        cnfg.loadFromJSON(json)
         listDestinationFields(cnfg.destinationTable)
         If destinationFieldNameToFID.Count > 0 Then
             For i As Integer = 0 To cnfg.destinationFields.Count - 1
@@ -349,7 +489,7 @@ Public Class frmETL
         btnImport.Visible = False
         dgMapping.Visible = False
         btnSave.Visible = False
-
+        btnCommandLine.Visible = False
 
         If lblDestinationTable.Text <> "" Then
             btnListFields.Visible = True
@@ -389,6 +529,9 @@ Public Class frmETL
             If txtSourcePWD.TextLength > 0 Then
                 txtSourceConnectionString.Text &= "PWD=" & txtSourcePWD.Text & ";"
             End If
+        End If
+        If lblJobFile.Text <> "" Then
+            btnCommandLine.Visible = True
         End If
     End Sub
     Private Sub lblDestinationTable_TextChanged(sender As Object, e As EventArgs) Handles lblDestinationTable.TextChanged
@@ -1047,6 +1190,15 @@ Public Class frmETL
         frmPreview.connectionString = txtDestinationConnectionString.Text
         frmPreview.ShowDialog()
         Me.Cursor = Cursors.Default
+    End Sub
+    Private Sub btnCommandLine_Click(sender As Object, e As EventArgs) Handles btnCommandLine.Click
+
+        Dim programScript As String = """" & cmdLineArgs(0) & """"
+        saveDialog.Filter = "BATCH Files (*.bat)|*.bat"
+        saveDialog.FileName = ""
+        If saveDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
+            My.Computer.FileSystem.WriteAllText(saveDialog.FileName, programScript & " """ & lblJobFile.Text & """ """ & Replace(lblJobFile.Text, ".job", ".log", 1, 1) & """", False, Encoding.ASCII)
+        End If
     End Sub
 End Class
 

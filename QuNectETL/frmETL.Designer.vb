@@ -71,6 +71,7 @@ Partial Class frmETL
         Me.cmbDestinationDSN = New System.Windows.Forms.ComboBox()
         Me.lblDestinationTable = New System.Windows.Forms.Label()
         Me.TabPageMapping = New System.Windows.Forms.TabPage()
+        Me.btnCommandLine = New System.Windows.Forms.Button()
         Me.lblProgress = New System.Windows.Forms.Label()
         CType(Me.dgMapping, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl.SuspendLayout()
@@ -137,9 +138,9 @@ Partial Class frmETL
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(343, 16)
+        Me.btnImport.Location = New System.Drawing.Point(290, 16)
         Me.btnImport.Name = "btnImport"
-        Me.btnImport.Size = New System.Drawing.Size(185, 27)
+        Me.btnImport.Size = New System.Drawing.Size(169, 27)
         Me.btnImport.TabIndex = 3
         Me.btnImport.Text = "Copy from Source to Destination"
         Me.btnImport.UseVisualStyleBackColor = True
@@ -157,14 +158,14 @@ Partial Class frmETL
         '
         Me.btnListFields.Location = New System.Drawing.Point(14, 17)
         Me.btnListFields.Name = "btnListFields"
-        Me.btnListFields.Size = New System.Drawing.Size(82, 27)
+        Me.btnListFields.Size = New System.Drawing.Size(64, 27)
         Me.btnListFields.TabIndex = 37
         Me.btnListFields.Text = "List Fields"
         Me.btnListFields.UseVisualStyleBackColor = True
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(264, 16)
+        Me.btnSave.Location = New System.Drawing.Point(220, 16)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(65, 27)
@@ -174,10 +175,10 @@ Partial Class frmETL
         '
         'btnLoad
         '
-        Me.btnLoad.Location = New System.Drawing.Point(107, 18)
+        Me.btnLoad.Location = New System.Drawing.Point(85, 18)
         Me.btnLoad.Margin = New System.Windows.Forms.Padding(2)
         Me.btnLoad.Name = "btnLoad"
-        Me.btnLoad.Size = New System.Drawing.Size(71, 26)
+        Me.btnLoad.Size = New System.Drawing.Size(59, 26)
         Me.btnLoad.TabIndex = 86
         Me.btnLoad.Text = "Load Job"
         Me.btnLoad.UseVisualStyleBackColor = True
@@ -198,7 +199,7 @@ Partial Class frmETL
         'ckbLogSQL
         '
         Me.ckbLogSQL.AutoSize = True
-        Me.ckbLogSQL.Location = New System.Drawing.Point(195, 21)
+        Me.ckbLogSQL.Location = New System.Drawing.Point(151, 21)
         Me.ckbLogSQL.Name = "ckbLogSQL"
         Me.ckbLogSQL.Size = New System.Drawing.Size(68, 17)
         Me.ckbLogSQL.TabIndex = 92
@@ -549,6 +550,7 @@ Partial Class frmETL
         '
         'TabPageMapping
         '
+        Me.TabPageMapping.Controls.Add(Me.btnCommandLine)
         Me.TabPageMapping.Controls.Add(Me.lblProgress)
         Me.TabPageMapping.Controls.Add(Me.lblJobFile)
         Me.TabPageMapping.Controls.Add(Me.dgMapping)
@@ -563,6 +565,15 @@ Partial Class frmETL
         Me.TabPageMapping.TabIndex = 3
         Me.TabPageMapping.Text = "Column Mapping"
         Me.TabPageMapping.UseVisualStyleBackColor = True
+        '
+        'btnCommandLine
+        '
+        Me.btnCommandLine.Location = New System.Drawing.Point(502, 54)
+        Me.btnCommandLine.Name = "btnCommandLine"
+        Me.btnCommandLine.Size = New System.Drawing.Size(110, 23)
+        Me.btnCommandLine.TabIndex = 94
+        Me.btnCommandLine.Text = "Create Batch File"
+        Me.btnCommandLine.UseVisualStyleBackColor = True
         '
         'lblProgress
         '
@@ -646,4 +657,5 @@ Partial Class frmETL
     Friend WithEvents lblDestinationRows As Label
     Friend WithEvents nudDestination As NumericUpDown
     Friend WithEvents btnPreviewDestination As Button
+    Friend WithEvents btnCommandLine As Button
 End Class
