@@ -1,9 +1,9 @@
 ﻿Imports System.Data.Odbc
 Imports System.IO
-Imports System.Reflection
 Imports System.Text
 Imports System.Text.RegularExpressions
 Imports System.Threading
+Imports QuNectETL.frmETL
 
 
 Public Class frmETL
@@ -36,8 +36,8 @@ Public Class frmETL
         Public Function toStringNoSQL() As String
             Return _
              "destination: " & destinationTable & vbCrLf &
-             "destination fields: " & destinationFields.ToString() & vbCrLf &
-             "sourceFieldOrdinals: " & sourceFieldOrdinals.ToString() & vbCrLf
+             "destination fields: " & String.Join(",", destinationFields.ToArray()) & vbCrLf &
+             "sourceFieldOrdinals: " & String.Join(",", sourceFieldOrdinals.ToArray()) & vbCrLf
         End Function
         Public Sub loadFromJSON(ByRef json As String)
             jsonPointer = 0
@@ -287,14 +287,15 @@ Public Class frmETL
             If Not automode AndAlso openFile.ShowDialog = Windows.Forms.DialogResult.OK Then
                 filename = openFile.FileName
                 lblJobFile.Text = filename
-            Else
-                Return
             End If
             jobFileReader = My.Computer.FileSystem.OpenTextFileReader(filename)
             Dim firstLine As String = jobFileReader.ReadLine()
+            If firstLine Is Nothing Then
+                Throw New Exception("Job file is blank.")
+            End If
             If firstLine.StartsWith("{") Then
                 loadJsonFile(firstLine, jobFileReader)
-                loadUIfromConfig()
+
             Else
                 loadOldConfig(jobFileReader, firstLine)
                 loadConfigFromUI()
@@ -433,20 +434,22 @@ Public Class frmETL
         saveDialog.Filter = "JOB Files (*.job)|*.job"
         saveDialog.FileName = lblJobFile.Text
         If saveDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
-            Dim strJob As String = createJSONString("sourceConnectionString", cnfg.sourceConnectionString, False)
+            Dim strJob As String = "{"
+            strJob &= createJSONString("sourceConnectionString", cnfg.sourceConnectionString, False)
             strJob &= createJSONString("sourceSQL", cnfg.sourceSQL, True)
             strJob &= createJSONArray("sourceFieldOrdinals", cnfg.sourceFieldOrdinals, True)
             strJob &= createJSONString("destinationConnectionString", cnfg.destinationConnectionString, True)
             strJob &= createJSONString("destinationTable", cnfg.destinationTable, True)
             strJob &= createJSONArray("destinationFields", cnfg.destinationFields, True)
             strJob &= createJSONBoolean("logSQL", cnfg.logSQL, True)
+            strJob &= "}"
             My.Computer.FileSystem.WriteAllText(saveDialog.FileName, strJob, False, Encoding.ASCII)
         End If
         lblJobFile.Text = saveDialog.FileName
         Me.Cursor = Cursors.Default
     End Sub
     Function createJSONString(ByRef name As String, ByRef value As String, comma As Boolean) As String
-        createJSONString = "{""" & name & """:""" & Replace(value, """", "\\""") & """"
+        createJSONString = """" & name & """:""" & Replace(value, """", "\""") & """"
         If comma Then
             createJSONString = "," & createJSONString
         End If
@@ -454,7 +457,7 @@ Public Class frmETL
     Function createJSONBoolean(ByRef name As String, bool As Boolean, comma As Boolean) As String
         Dim value As String = "false"
         If bool Then value = "true"
-        createJSONBoolean = "{""" & name & """:""" & value & """"
+        createJSONBoolean = """" & name & """:""" & value & """"
         If comma Then
             createJSONBoolean = "," & createJSONBoolean
         End If
@@ -463,10 +466,10 @@ Public Class frmETL
         Dim strArray As String = ""
         Dim comma As String = ""
         For Each val As String In ary
-            strArray = comma & """" & Replace(val, """", "\\""") & """"
+            strArray &= comma & """" & Replace(val, """", "\""") & """"
             comma = ","
         Next
-        createJSONArray = "{""" & name & """:[" & strArray & "]"
+        createJSONArray = """" & name & """:[" & strArray & "]"
         If notfirst Then
             createJSONArray = "," & createJSONArray
         End If
@@ -476,6 +479,7 @@ Public Class frmETL
             json &= jobFileReader.ReadLine
         End While
         cnfg.loadFromJSON(json)
+        loadUIfromConfig()
         listDestinationFields(cnfg.destinationTable)
         If destinationFieldNameToFID.Count > 0 Then
             For i As Integer = 0 To cnfg.destinationFields.Count - 1
@@ -512,7 +516,7 @@ Public Class frmETL
         SaveSetting(AppName, "Credentials", "destinationUID", txtDestinationUID.Text)
         SaveSetting(AppName, "Credentials", "sourcePWD", txtSourcePWD.Text)
         SaveSetting(AppName, "Credentials", "destinationPWD", txtDestinationPWD.Text)
-        If rdbDestinationDSN.Checked Then
+        If rdbDestinationDSN.Checked And cmbDestinationDSN.Text <> "" Then
             txtDestinationConnectionString.Text = "DSN=" & cmbDestinationDSN.Text & ";"
             If txtDestinationUID.TextLength > 0 Then
                 txtDestinationConnectionString.Text &= "UID=" & txtDestinationUID.Text & ";"
@@ -521,7 +525,7 @@ Public Class frmETL
                 txtDestinationConnectionString.Text &= "PWD=" & txtDestinationPWD.Text & ";"
             End If
         End If
-        If rdbSourceDSN.Checked Then
+        If rdbSourceDSN.Checked And cmbSourceDSN.Text <> "" Then
             txtSourceConnectionString.Text = "DSN=" & cmbSourceDSN.Text & ";"
             If txtSourceUID.TextLength > 0 Then
                 txtSourceConnectionString.Text &= "UID=" & txtSourceUID.Text & ";"
@@ -1192,7 +1196,7 @@ Public Class frmETL
         Me.Cursor = Cursors.Default
     End Sub
     Private Sub btnCommandLine_Click(sender As Object, e As EventArgs) Handles btnCommandLine.Click
-
+        loadConfigFromUI()
         Dim programScript As String = """" & cmdLineArgs(0) & """"
         saveDialog.Filter = "BATCH Files (*.bat)|*.bat"
         saveDialog.FileName = ""
