@@ -725,7 +725,7 @@ Public Class frmETL
                     srcConnection = New OdbcConnection(upCnfg.sourceConnectionString)
                     srcConnection.Open()
                     If srcConnection.DataSource <> "QuNect ODBC for QuickBase" And destinationConnection.DataSource <> "QuNect ODBC for QuickBase" Then
-                        Alert("QuNect ETL must be used to import of export data from Quickbase.")
+                        Alert("QuNect ETL must be used to import or export data from Quickbase." & vbCrLf & srcConnection.DataSource & vbCrLf & destinationConnection.DataSource)
                         srcConnection.Close()
                         Return False
                     End If
