@@ -1065,24 +1065,34 @@ Public Class frmETL
         Dim key As Microsoft.Win32.RegistryKey
         cmbSourceDSN.Items.Add("Please choose...")
         cmbDestinationDSN.Items.Add("Please choose...")
-        key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("software\odbc\odbc.ini\odbc data sources")
-        If key Is Nothing Then
-            Alert("Sorry no DSNs to choose from." & vbCrLf & "Please install QuNect ODBC for QuickBase from https://qunect.com")
-            Return
-        End If
-        strKeyNames = key.GetValueNames() 'Get an array of the key names
-        intKeyCount = key.ValueCount() 'Get the number of keys
-        For intCount = 0 To intKeyCount - 1
-            cmbSourceDSN.Items.Add(strKeyNames(intCount))
-            cmbDestinationDSN.Items.Add(strKeyNames(intCount))
-        Next
-        key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("software\odbc\odbc.ini\odbc data sources")
-        strKeyNames = key.GetValueNames() 'Get an array of the value names
-        intKeyCount = key.ValueCount() 'Get the number of values
-        For intCount = 0 To intKeyCount - 1
-            cmbSourceDSN.Items.Add(strKeyNames(intCount))
-            cmbDestinationDSN.Items.Add(strKeyNames(intCount))
-        Next
+        Try
+            key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("software\odbc\odbc.ini\odbc data sources")
+            If key Is Nothing Then
+                Alert("Sorry no DSNs to choose from." & vbCrLf & "Please install QuNect ODBC for QuickBase from https://qunect.com")
+                Return
+            End If
+            strKeyNames = key.GetValueNames() 'Get an array of the key names
+            intKeyCount = key.ValueCount() 'Get the number of keys
+                For intCount = 0 To intKeyCount - 1
+                    cmbSourceDSN.Items.Add(strKeyNames(intCount))
+                    cmbDestinationDSN.Items.Add(strKeyNames(intCount))
+                Next
+        Catch ex As Exception
+            Alert("Could not access system DSNs.")
+        End Try
+
+        Try
+            key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("software\odbc\odbc.ini\odbc data sources")
+            strKeyNames = key.GetValueNames() 'Get an array of the value names
+            intKeyCount = key.ValueCount() 'Get the number of values
+            For intCount = 0 To intKeyCount - 1
+                cmbSourceDSN.Items.Add(strKeyNames(intCount))
+                cmbDestinationDSN.Items.Add(strKeyNames(intCount))
+            Next
+        Catch ex As Exception
+            Alert("Could not access user DSNs.")
+        End Try
+
         cmbSourceDSN.SelectedIndex = 0
         cmbDestinationDSN.SelectedIndex = 0
     End Sub
