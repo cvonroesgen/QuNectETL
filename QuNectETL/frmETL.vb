@@ -1078,7 +1078,7 @@ Public Class frmETL
                     cmbDestinationDSN.Items.Add(strKeyNames(intCount))
                 Next
         Catch ex As Exception
-            Alert("Could not access system DSNs.")
+            Alert("Could not access system DSNs. " & vbCrLf & ex.Message)
         End Try
 
         Try
@@ -1090,7 +1090,7 @@ Public Class frmETL
                 cmbDestinationDSN.Items.Add(strKeyNames(intCount))
             Next
         Catch ex As Exception
-            Alert("Could not access user DSNs.")
+            Alert("Could not access user DSNs. " & vbCrLf & ex.Message)
         End Try
 
         cmbSourceDSN.SelectedIndex = 0
