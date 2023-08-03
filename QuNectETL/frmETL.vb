@@ -477,7 +477,7 @@ Public Class frmETL
     End Function
     Sub loadJsonFile(json As String, jobFileReader As System.IO.StreamReader)
         While Not jobFileReader.EndOfStream
-            json &= jobFileReader.ReadLine
+            json &= jobFileReader.ReadLine & vbCrLf
         End While
         cnfg.loadFromJSON(json)
         loadUIfromConfig()
