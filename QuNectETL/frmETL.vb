@@ -1163,7 +1163,7 @@ Public Class frmETL
     End Sub
 
     Private Sub dgMapping_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles dgMapping.DataError
-        Alert("Mapping Grid error on row " & e.RowIndex & " " & e.Exception.Message)
+        'Alert("Mapping Grid error on row " & e.RowIndex & " column " & e.ColumnIndex & " " & e.Exception.Message)
     End Sub
 
     Private Sub txtDestinationPWD_TextChanged(sender As Object, e As EventArgs) Handles txtDestinationPWD.TextChanged

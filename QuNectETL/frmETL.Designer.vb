@@ -107,7 +107,7 @@ Partial Class frmETL
         DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
         DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.dgMapping.DefaultCellStyle = DataGridViewCellStyle2
-        Me.dgMapping.Location = New System.Drawing.Point(14, 84)
+        Me.dgMapping.Location = New System.Drawing.Point(14, 120)
         Me.dgMapping.Name = "dgMapping"
         DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control
@@ -118,7 +118,7 @@ Partial Class frmETL
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
         Me.dgMapping.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.dgMapping.RowHeadersWidth = 62
-        Me.dgMapping.Size = New System.Drawing.Size(603, 619)
+        Me.dgMapping.Size = New System.Drawing.Size(603, 583)
         Me.dgMapping.TabIndex = 0
         '
         'Source
@@ -568,7 +568,7 @@ Partial Class frmETL
         '
         'btnCommandLine
         '
-        Me.btnCommandLine.Location = New System.Drawing.Point(502, 54)
+        Me.btnCommandLine.Location = New System.Drawing.Point(465, 18)
         Me.btnCommandLine.Name = "btnCommandLine"
         Me.btnCommandLine.Size = New System.Drawing.Size(110, 23)
         Me.btnCommandLine.TabIndex = 94
@@ -578,7 +578,7 @@ Partial Class frmETL
         'lblProgress
         '
         Me.lblProgress.AutoSize = True
-        Me.lblProgress.Location = New System.Drawing.Point(545, 23)
+        Me.lblProgress.Location = New System.Drawing.Point(17, 91)
         Me.lblProgress.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblProgress.Name = "lblProgress"
         Me.lblProgress.Size = New System.Drawing.Size(0, 13)
