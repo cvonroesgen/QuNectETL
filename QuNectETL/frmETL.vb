@@ -1046,13 +1046,8 @@ Public Class frmETL
             Me.lblProgress.Text = progressMessage
         End If
     End Sub
-    Delegate Sub PBDelegate(numRecords As Integer)
-
-
     Private Sub cmbDestinationDSN_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbDestinationDSN.SelectedIndexChanged
         showHideControls()
-
-
     End Sub
     Private Sub cmbSourceDSN_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbSourceDSN.SelectedIndexChanged
         showHideControls()
