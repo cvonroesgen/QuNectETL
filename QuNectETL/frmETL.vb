@@ -158,6 +158,8 @@ Public Class frmETL
             Return label
         End Function
     End Class
+    Dim OdbcTypeToString As New Dictionary(Of Integer, String)
+
     Private cmdLineArgs() As String
     Private automode As Boolean = True
     Public Const AppName = "QuNectETL"
@@ -263,7 +265,7 @@ Public Class frmETL
         End If
         lblDestinationTable.Text = GetSetting(AppName, "config", "destinationtable", "")
         txtSQL.Text = GetSetting(AppName, "config", "SQL", "")
-
+        mapODBCEnumToStrings()
         showHideControls()
         Me.Cursor = Cursors.Default
     End Sub
@@ -734,7 +736,7 @@ Public Class frmETL
                             While (dr.Read())
                                 For i As Integer = 0 To sourceFieldMaxIndex
                                     If setODBCParameter(qdbTypes(i), dr.GetValue(upCnfg.sourceFieldOrdinals(i)), CStr(i), destinationCommand, conversionErrors) Then
-                                        Throw New System.Exception("Could not convert '" & dr.GetValue(upCnfg.sourceFieldOrdinals(i)) & "' to " & qdbTypes(i))
+                                        Throw New System.Exception("Could not convert the source field '" & dr.GetName(upCnfg.sourceFieldOrdinals(i)) & "' whose value is '" & dr.GetValue(upCnfg.sourceFieldOrdinals(i)) & "' to the data type of " & OdbcTypeToString(qdbTypes(i)) & " of destination field " & upCnfg.destinationFields(i))
                                     End If
                                 Next
                                 If fileLineCounter Mod 1000 = 0 And Not automode Then
@@ -1205,6 +1207,35 @@ Public Class frmETL
             My.Computer.FileSystem.WriteAllText(saveDialog.FileName, programScript & " """ & lblJobFile.Text & """ """ & Replace(lblJobFile.Text, ".job", ".log", 1, 1) & """", False, Encoding.ASCII)
         End If
     End Sub
+
+    Private Sub mapODBCEnumToStrings()
+        OdbcTypeToString.Add(1, "BigInt")
+        OdbcTypeToString.Add(2, "Binary")
+        OdbcTypeToString.Add(3, "Bit")
+        OdbcTypeToString.Add(4, "Char")
+        OdbcTypeToString.Add(5, "DateTime")
+        OdbcTypeToString.Add(6, "Decimal")
+        OdbcTypeToString.Add(7, "Numeric")
+        OdbcTypeToString.Add(8, "Double")
+        OdbcTypeToString.Add(9, "Image")
+        OdbcTypeToString.Add(10, "Int")
+        OdbcTypeToString.Add(11, "NChar")
+        OdbcTypeToString.Add(12, "NText")
+        OdbcTypeToString.Add(13, "NVarChar")
+        OdbcTypeToString.Add(14, "Real")
+        OdbcTypeToString.Add(15, "UniqueIdentifier")
+        OdbcTypeToString.Add(16, "SmallDateTime")
+        OdbcTypeToString.Add(17, "SmallInt")
+        OdbcTypeToString.Add(18, "Text")
+        OdbcTypeToString.Add(19, "Timestamp")
+        OdbcTypeToString.Add(20, "TinyInt")
+        OdbcTypeToString.Add(21, "VarBinary")
+        OdbcTypeToString.Add(22, "VarChar")
+        OdbcTypeToString.Add(23, "Date")
+        OdbcTypeToString.Add(24, "Time")
+    End Sub
+
+
 End Class
 
 
