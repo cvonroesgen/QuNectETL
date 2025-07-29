@@ -29,7 +29,7 @@
     <ErrorReportUrl>http://www.qunect.com</ErrorReportUrl>
     <ProductName>QuNect ETL</ProductName>
     <PublisherName>QuNect</PublisherName>
-    <ApplicationRevision>56</ApplicationRevision>
+    <ApplicationRevision>57</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -72,7 +72,7 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>33507C0B6EA299C179552EABEECBD00EA1B24831</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>2C3C8D3F99A7634EA79FE66C53A65CF7F9835344</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
