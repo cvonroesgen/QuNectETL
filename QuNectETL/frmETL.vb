@@ -545,21 +545,6 @@ Public Class frmETL
         SaveSetting(AppName, "config", "destinationtable", lblDestinationTable.Text)
         showHideControls()
     End Sub
-
-
-    Private Function getQDBConnectionString(usefids As Boolean, txtUsername As String, txtPassword As String, txtServer As String, txtAppToken As String, pwdIsPassword As Boolean) As String
-
-        getQDBConnectionString = "Driver={QuNect ODBC For QuickBase};FIELDNAMECHARACTERS=all;ALLREVISIONS=ALL;uid=" & txtUsername & ";pwd=" & txtPassword & ";QUICKBASESERVER=" & txtServer & ";APPTOKEN=" & txtAppToken
-        If usefids Then
-            getQDBConnectionString &= ";USEFIDS=1"
-        End If
-        If pwdIsPassword Then
-            getQDBConnectionString &= ";PWDISPASSWORD=1"
-        Else
-            getQDBConnectionString &= ";PWDISPASSWORD=0"
-        End If
-
-    End Function
     Function countRecords(sql As String, connection As OdbcConnection) As Integer
         Using command As OdbcCommand = New OdbcCommand(sql, connection)
             Dim dr As OdbcDataReader
@@ -656,6 +641,8 @@ Public Class frmETL
                 Return OdbcType.Timestamp
             Case "tinyint"
                 Return OdbcType.TinyInt
+            Case "longvarbinary"
+                Return OdbcType.VarBinary
             Case "varbinary"
                 Return OdbcType.VarBinary
             Case "varchar"

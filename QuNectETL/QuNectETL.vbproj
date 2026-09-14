@@ -72,7 +72,7 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>2C3C8D3F99A7634EA79FE66C53A65CF7F9835344</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>F9C6890D3612C59B8B10C6883B3592B8AA2E75D4</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
