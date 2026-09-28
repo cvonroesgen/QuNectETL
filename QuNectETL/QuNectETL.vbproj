@@ -139,6 +139,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConnectionHelpers.vb" />
     <Compile Include="frmPreview.Designer.vb">
       <DependentUpon>frmPreview.vb</DependentUpon>
     </Compile>

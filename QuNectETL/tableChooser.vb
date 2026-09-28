@@ -21,7 +21,7 @@
                 frmETL.txtSQL.Text = "SELECT "
                 Dim comma As String = ""
                 For Each columnRow As DataRow In sourceColumns.Rows
-                    frmETL.txtSQL.Text &= comma & """" & columnRow(0) & """"
+                    frmETL.txtSQL.Text &= comma & """" & columnRow(SchemaColumnName).ToString() & """"
                     comma = ","
                 Next
                 frmETL.txtSQL.Text &= " FROM """ & tvAppsTables.SelectedNode.Text() & """"

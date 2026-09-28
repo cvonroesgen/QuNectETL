@@ -722,8 +722,12 @@ Public Class frmETL
                             dr = srcCmd.ExecuteReader()
                             While (dr.Read())
                                 For i As Integer = 0 To sourceFieldMaxIndex
-                                    If setODBCParameter(qdbTypes(i), dr.GetValue(upCnfg.sourceFieldOrdinals(i)), CStr(i), destinationCommand, conversionErrors) Then
-                                        Throw New System.Exception("Could not convert the source field '" & dr.GetName(upCnfg.sourceFieldOrdinals(i)) & "' whose value is '" & dr.GetValue(upCnfg.sourceFieldOrdinals(i)) & "' to the data type of " & OdbcTypeToString(qdbTypes(i)) & " of destination field " & upCnfg.destinationFields(i))
+                                    If (dr.IsDBNull(upCnfg.sourceFieldOrdinals(i))) Then
+                                        destinationCommand.Parameters("@fid" & i).Value = DBNull.Value
+                                    Else
+                                        If setODBCParameter(qdbTypes(i), dr.GetValue(upCnfg.sourceFieldOrdinals(i)), CStr(i), destinationCommand, conversionErrors) Then
+                                            Throw New System.Exception("Could not convert the source field '" & dr.GetName(upCnfg.sourceFieldOrdinals(i)) & "' whose value is '" & dr.GetValue(upCnfg.sourceFieldOrdinals(i)) & "' to the data type of " & OdbcTypeToString(qdbTypes(i)) & " of destination field " & upCnfg.destinationFields(i))
+                                        End If
                                     End If
                                 Next
                                 If fileLineCounter Mod 1000 = 0 And Not automode Then
@@ -918,7 +922,15 @@ Public Class frmETL
             dgMapping.Rows.Clear()
             Dim i As Integer = 0
             For Each columnRow As DataRow In sourceColumns.Rows
-                Dim field As New odbcField(columnRow(0), columnRow(5).Name)
+                Dim columnName As String = columnRow(SchemaColumnName).ToString()
+                Dim dataType As Type = TryCast(columnRow(SchemaDataType), Type)
+                Dim fieldTypeName As String = ""
+
+                If dataType IsNot Nothing Then
+                    fieldTypeName = dataType.Name
+                End If
+
+                Dim field As New odbcField(columnName, fieldTypeName)
                 dgMapping.Rows.Add(New String() {field.label})
                 sourceFieldNames.Add(field.label, i)
                 i += 1
@@ -939,29 +951,18 @@ Public Class frmETL
     End Function
 
     Function getColumnsDataTable(strSourceSQL As String, connectionString As String) As DataTable
-        Dim srcConnection As OdbcConnection
-        srcConnection = New OdbcConnection(connectionString)
-        srcConnection.Open()
-        Using srcCmd As OdbcCommand = New OdbcCommand(strSourceSQL, srcConnection)
-            Dim dr As OdbcDataReader
-            Try
-                dr = srcCmd.ExecuteReader()
-            Catch excpt As Exception
-                Alert("Could not get field information from " & cmbSourceDSN.Text & vbCrLf & excpt.Message)
+        Try
+            Return executeSourceReader(connectionString, strSourceSQL, CommandBehavior.SchemaOnly,
+                Function(dr As IDataReader) dr.GetSchemaTable())
+        Catch excpt As Exception
+            If excpt.Message.Contains("SS_TIME_EX") Then
+                Alert("The source contains a Time of Day field which is not supported by the ODBC schema reader. Please use a SQL Server connection or cast the time column in the SQL.")
                 Return Nothing
-            End Try
+            End If
 
-            Try
-                getColumnsDataTable = dr.GetSchemaTable()
-                dr.Close()
-            Catch excpt As Exception
-                If excpt.Message.Contains("SS_TIME_EX") Then
-                    Alert("The source contains a Time of Day field which is not supported. Please try a SQL statement that specifies only non time of day columns.")
-                    Return Nothing
-                End If
-                Throw New System.Exception("Could not get field information for " & cmbSourceDSN.Text & " " & excpt.Message)
-            End Try
-        End Using
+            Alert("Could not get field information from " & cmbSourceDSN.Text & vbCrLf & excpt.Message)
+            Return Nothing
+        End Try
     End Function
     Sub guessDestination(sourceFieldName As String, sourceFieldOrdinal As Integer)
 
@@ -1224,5 +1225,7 @@ Public Class frmETL
 
 
 End Class
+
+
 
 
