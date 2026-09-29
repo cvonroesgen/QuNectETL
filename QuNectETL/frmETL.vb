@@ -831,12 +831,8 @@ Public Class frmETL
     Private Sub listTables(connectionString As String)
         Me.Cursor = Cursors.WaitCursor
         Try
-            Dim odbcConn As OdbcConnection = getODBCConnection(connectionString)
-            Dim tables As DataTable = odbcConn.GetSchema("Tables")
-            Dim views As DataTable = odbcConn.GetSchema("Views")
-            tables.Merge(views)
+            Dim tables As DataTable = getTablesForChooser(connectionString)
             listTablesFromGetSchema(tables)
-
         Catch ex As Exception
             Alert("Could not list tables because " & ex.Message)
             Me.Cursor = Cursors.Default
@@ -847,31 +843,34 @@ Public Class frmETL
         frmTableChooser.tvAppsTables.BeginUpdate()
         frmTableChooser.tvAppsTables.Nodes.Clear()
         frmTableChooser.tvAppsTables.ShowNodeToolTips = True
-        Dim dbName As String
-        Dim applicationName As String = ""
-        Dim prevAppName As String = ""
 
+        Dim groupName As String = ""
+        Dim prevGroupName As String = ""
 
         For i = 0 To tables.Rows.Count - 1
-
             Application.DoEvents()
-            dbName = tables.Rows(i)(2)
-            applicationName = tables.Rows(i)(0)
-            If applicationName <> prevAppName Then
 
-                Dim appNode As TreeNode = frmTableChooser.tvAppsTables.Nodes.Add(applicationName)
-                prevAppName = applicationName
+            groupName = tables.Rows(i)(TableChooserGroupName).ToString()
+            Dim displayName As String = tables.Rows(i)(TableChooserDisplayName).ToString()
+            Dim fullName As String = tables.Rows(i)(TableChooserFullName).ToString()
+            Dim selectName As String = tables.Rows(i)(TableChooserSelectName).ToString()
+
+            If groupName <> prevGroupName Then
+                frmTableChooser.tvAppsTables.Nodes.Add(groupName)
+                prevGroupName = groupName
             End If
-            Dim tableName As String = dbName
-            If applicationName.Length Then
-                Dim tableNode As TreeNode = frmTableChooser.tvAppsTables.Nodes(frmTableChooser.tvAppsTables.Nodes.Count - 1).Nodes.Add(tableName)
 
+            Dim tableNode As TreeNode
+            If groupName.Length > 0 Then
+                tableNode = frmTableChooser.tvAppsTables.Nodes(frmTableChooser.tvAppsTables.Nodes.Count - 1).Nodes.Add(displayName)
             Else
-                Dim tableNode As TreeNode = frmTableChooser.tvAppsTables.Nodes.Add(tableName)
-
+                tableNode = frmTableChooser.tvAppsTables.Nodes.Add(displayName)
             End If
 
+            tableNode.Name = fullName
+            tableNode.Tag = selectName
         Next
+
         frmTableChooser.Text = "Choose a Table"
         frmTableChooser.tvAppsTables.EndUpdate()
 
@@ -880,6 +879,7 @@ Public Class frmETL
         frmTableChooser.Show()
         Me.Cursor = Cursors.Default
     End Sub
+
     Function listDestinationFields(tableName As String) As Dictionary(Of String, String)
         listDestinationFields = New Dictionary(Of String, String)
         Try
@@ -1225,6 +1225,9 @@ Public Class frmETL
 
 
 End Class
+
+
+
 
 
 
