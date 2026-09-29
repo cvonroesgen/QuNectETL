@@ -1409,7 +1409,7 @@ Public Class frmETL
             Exit Sub
         End If
         Me.Cursor = Cursors.WaitCursor
-        frmPreview.sql = "SELECT * FROM """ & lblDestinationTable.Text & """"
+        frmPreview.sql = "SELECT * FROM " & quoteTableName(txtDestinationConnectionString.Text, lblDestinationTable.Text)
         frmPreview.connectionString = txtDestinationConnectionString.Text
         frmPreview.ShowDialog()
         Me.Cursor = Cursors.Default
@@ -1453,6 +1453,12 @@ Public Class frmETL
 
 
 End Class
+
+
+
+
+
+
 
 
 
