@@ -1,5 +1,6 @@
 ﻿Imports System.Data.Odbc
 Imports System.IO
+Imports System.Data.SqlClient
 Imports System.Text
 Imports System.Text.RegularExpressions
 Imports System.Threading
@@ -599,6 +600,46 @@ Public Class frmETL
         End Try
         Return False
     End Function
+    Function setSqlParameter(ByRef sqlTyp As SqlDbType, ByRef val As Object, fid As String, ByRef command As SqlCommand, ByRef conversionErrors As String) As Boolean
+
+        If IsDBNull(val) Then
+            command.Parameters("@fid" & fid).Value = val
+            Return False
+        End If
+        Try
+            Select Case sqlTyp
+                Case SqlDbType.Int
+                    command.Parameters("@fid" & fid).Value = Convert.ToInt32(val)
+                Case SqlDbType.BigInt
+                    command.Parameters("@fid" & fid).Value = Convert.ToInt64(val)
+                Case SqlDbType.SmallInt
+                    command.Parameters("@fid" & fid).Value = Convert.ToInt16(val)
+                Case SqlDbType.TinyInt
+                    command.Parameters("@fid" & fid).Value = Convert.ToByte(val)
+                Case SqlDbType.Decimal, SqlDbType.Float, SqlDbType.Real, SqlDbType.Money, SqlDbType.SmallMoney
+                    command.Parameters("@fid" & fid).Value = Convert.ToDouble(val)
+                Case SqlDbType.Date
+                    command.Parameters("@fid" & fid).Value = Convert.ToDateTime(val).Date
+                Case SqlDbType.DateTime, SqlDbType.DateTime2, SqlDbType.SmallDateTime, SqlDbType.DateTimeOffset
+                    command.Parameters("@fid" & fid).Value = Convert.ToDateTime(val)
+                Case SqlDbType.Time
+                    command.Parameters("@fid" & fid).Value = val
+                Case SqlDbType.Bit
+                    Dim match As Match = isBooleanTrue.Match(val.ToString())
+                    If match.Success Then
+                        command.Parameters("@fid" & fid).Value = True
+                    Else
+                        command.Parameters("@fid" & fid).Value = False
+                    End If
+                Case Else
+                    command.Parameters("@fid" & fid).Value = val
+            End Select
+        Catch ex As Exception
+            conversionErrors = ex.Message
+            Return True
+        End Try
+        Return False
+    End Function
     Private Function getODBCType(strType As String) As OdbcType
         Select Case strType.ToLower
             Case "bigint"
@@ -655,6 +696,64 @@ Public Class frmETL
                 Return OdbcType.VarChar
         End Select
     End Function
+    Private Function getSqlDbType(strType As String) As SqlDbType
+        Select Case strType.ToLower
+            Case "bigint"
+                Return SqlDbType.BigInt
+            Case "binary"
+                Return SqlDbType.Binary
+            Case "bit"
+                Return SqlDbType.Bit
+            Case "char"
+                Return SqlDbType.Char
+            Case "date"
+                Return SqlDbType.Date
+            Case "datetime"
+                Return SqlDbType.DateTime
+            Case "datetime2"
+                Return SqlDbType.DateTime2
+            Case "datetimeoffset"
+                Return SqlDbType.DateTimeOffset
+            Case "decimal", "numeric"
+                Return SqlDbType.Decimal
+            Case "float"
+                Return SqlDbType.Float
+            Case "image"
+                Return SqlDbType.Image
+            Case "int"
+                Return SqlDbType.Int
+            Case "money"
+                Return SqlDbType.Money
+            Case "nchar"
+                Return SqlDbType.NChar
+            Case "ntext"
+                Return SqlDbType.NText
+            Case "nvarchar"
+                Return SqlDbType.NVarChar
+            Case "real"
+                Return SqlDbType.Real
+            Case "smalldatetime"
+                Return SqlDbType.SmallDateTime
+            Case "smallint"
+                Return SqlDbType.SmallInt
+            Case "smallmoney"
+                Return SqlDbType.SmallMoney
+            Case "time"
+                Return SqlDbType.Time
+            Case "tinyint"
+                Return SqlDbType.TinyInt
+            Case "uniqueidentifier"
+                Return SqlDbType.UniqueIdentifier
+            Case "varbinary"
+                Return SqlDbType.VarBinary
+            Case "varchar"
+                Return SqlDbType.VarChar
+            Case "xml"
+                Return SqlDbType.Xml
+            Case Else
+                Return SqlDbType.VarChar
+        End Select
+    End Function
 
     Private Function uploadToDestination(cnctStrings As connectionStrings) As Boolean
         Dim destinationFields As New ArrayList
@@ -678,7 +777,100 @@ Public Class frmETL
         Me.Cursor = Cursors.Default
         Return True
     End Function
+    Private Function executeUploadToSqlDestination(upCnfg As config) As Boolean
+        Try
+            Dim strDestinationSQL As String = "INSERT INTO " & quoteTableName(upCnfg.destinationConnectionString, upCnfg.destinationTable) & " ("
+            Dim sqlConnectionString As String = ""
+            If Not tryBuildSqlServerConnectionString(upCnfg.destinationConnectionString, sqlConnectionString) Then
+                Throw New System.Exception("Could not determine the SQL Server destination connection string.")
+            End If
+
+            Using sqlDestinationConnection As New SqlConnection(sqlConnectionString)
+                sqlDestinationConnection.Open()
+
+                Dim quotedDestinationFields As New List(Of String)
+                For Each field In upCnfg.destinationFields
+                    quotedDestinationFields.Add(quoteIdentifier(upCnfg.destinationConnectionString, field.ToString()))
+                Next
+
+                strDestinationSQL &= String.Join(", ", quotedDestinationFields.ToArray()) & ") VALUES ("
+                For j As Integer = 0 To upCnfg.destinationFields.Count - 1
+                    strDestinationSQL &= "@fid" & j & ","
+                Next
+                If strDestinationSQL.Length > 0 Then
+                    strDestinationSQL = strDestinationSQL.Substring(0, strDestinationSQL.Length - 1)
+                End If
+                strDestinationSQL &= ")"
+
+                Using destinationCommand As SqlCommand = New SqlCommand(strDestinationSQL, sqlDestinationConnection)
+                    Dim sqlTypes(upCnfg.destinationFields.Count) As SqlDbType
+                    For j As Integer = 0 To upCnfg.destinationFields.Count - 1
+                        sqlTypes(j) = getSqlDbType(destinationFieldNameToType(upCnfg.destinationFields(j)))
+                        destinationCommand.Parameters.Add("@fid" & j, sqlTypes(j))
+                    Next
+
+                    Dim transaction As SqlTransaction = sqlDestinationConnection.BeginTransaction()
+                    destinationCommand.Transaction = transaction
+                    destinationCommand.CommandType = CommandType.Text
+                    destinationCommand.CommandTimeout = 0
+                    If Not automode Then
+                        Dim progressThread As System.Threading.Thread = New Threading.Thread(AddressOf showProgress)
+                        Volatile.Write(progressMessage, "Initializing...")
+                        progressThread.Start()
+                    End If
+                    Dim fileLineCounter As Integer = 0
+                    Dim conversionErrors As String = ""
+                    Try
+                        executeSourceReader(upCnfg.sourceConnectionString, upCnfg.sourceSQL, CommandBehavior.Default,
+                            Function(dr As IDataReader) As Boolean
+                                Dim sourceFieldMaxIndex As Integer = upCnfg.sourceFieldOrdinals.Count - 1
+                                While (dr.Read())
+                                    For i As Integer = 0 To sourceFieldMaxIndex
+                                        If (dr.IsDBNull(upCnfg.sourceFieldOrdinals(i))) Then
+                                            destinationCommand.Parameters("@fid" & i).Value = DBNull.Value
+                                        Else
+                                            If setSqlParameter(sqlTypes(i), dr.GetValue(upCnfg.sourceFieldOrdinals(i)), CStr(i), destinationCommand, conversionErrors) Then
+                                                Throw New System.Exception("Could not convert the source field '" & dr.GetName(upCnfg.sourceFieldOrdinals(i)) & "' whose value is '" & dr.GetValue(upCnfg.sourceFieldOrdinals(i)) & "' to the data type of " & sqlTypes(i).ToString() & " of destination field " & upCnfg.destinationFields(i))
+                                            End If
+                                        End If
+                                    Next
+                                    If fileLineCounter Mod 1000 = 0 And Not automode Then
+                                        Volatile.Write(progressMessage, "Queuing up record " & fileLineCounter)
+                                    End If
+                                    fileLineCounter += destinationCommand.ExecuteNonQuery()
+                                End While
+                                Return True
+                            End Function)
+
+                        If Not automode Then
+                            Volatile.Write(progressMessage, "Committing " & fileLineCounter & " records")
+                        End If
+                        transaction.Commit()
+                        If Not automode Then
+                            Volatile.Write(progressMessage, "Committed " & fileLineCounter & " records")
+                        End If
+                        Alert(fileLineCounter & " rows were uploaded to " & sqlDestinationConnection.DataSource & ".")
+                    Catch excpt As Exception
+                        transaction.Rollback()
+                        Throw New System.Exception("Could not get record " & fileLineCounter & " from " & upCnfg.sourceConnectionString & vbCrLf & excpt.Message)
+                    End Try
+                End Using
+            End Using
+        Catch ex As Exception
+            If Not automode Then
+                Volatile.Write(progressMessage, "")
+            End If
+            Alert("Could not copy because " & ex.Message)
+        End Try
+        If Not automode Then
+            Volatile.Write(progressMessage, "")
+        End If
+        Return True
+    End Function
     Private Function executeUpload(upCnfg As config) As Boolean
+        If isSqlServerConnection(upCnfg.destinationConnectionString) Then
+            Return executeUploadToSqlDestination(upCnfg)
+        End If
         Try
             Dim strDestinationSQL As String = "INSERT INTO """ & upCnfg.destinationTable & """ ("""
             Dim destinationConnection As OdbcConnection = getODBCConnection(upCnfg.destinationConnectionString)
@@ -709,48 +901,42 @@ Public Class frmETL
                         Volatile.Write(progressMessage, "Initializing...")
                         progressThread.Start()
                     End If
-                    'we have to open up a reader on the source
-                    Dim srcConnection As OdbcConnection
-                    srcConnection = New OdbcConnection(upCnfg.sourceConnectionString)
-                    srcConnection.Open()
                     Dim fileLineCounter As Integer = 0
                     Dim conversionErrors As String = ""
-                    Using srcCmd As OdbcCommand = New OdbcCommand(upCnfg.sourceSQL, srcConnection)
-                        Dim dr As OdbcDataReader
-                        Try
-                            Dim sourceFieldMaxIndex As Integer = upCnfg.sourceFieldOrdinals.Count - 1
-                            dr = srcCmd.ExecuteReader()
-                            While (dr.Read())
-                                For i As Integer = 0 To sourceFieldMaxIndex
-                                    If (dr.IsDBNull(upCnfg.sourceFieldOrdinals(i))) Then
-                                        destinationCommand.Parameters("@fid" & i).Value = DBNull.Value
-                                    Else
-                                        If setODBCParameter(qdbTypes(i), dr.GetValue(upCnfg.sourceFieldOrdinals(i)), CStr(i), destinationCommand, conversionErrors) Then
-                                            Throw New System.Exception("Could not convert the source field '" & dr.GetName(upCnfg.sourceFieldOrdinals(i)) & "' whose value is '" & dr.GetValue(upCnfg.sourceFieldOrdinals(i)) & "' to the data type of " & OdbcTypeToString(qdbTypes(i)) & " of destination field " & upCnfg.destinationFields(i))
+                    Try
+                        executeSourceReader(upCnfg.sourceConnectionString, upCnfg.sourceSQL, CommandBehavior.Default,
+                            Function(dr As IDataReader) As Boolean
+                                Dim sourceFieldMaxIndex As Integer = upCnfg.sourceFieldOrdinals.Count - 1
+                                While (dr.Read())
+                                    For i As Integer = 0 To sourceFieldMaxIndex
+                                        If (dr.IsDBNull(upCnfg.sourceFieldOrdinals(i))) Then
+                                            destinationCommand.Parameters("@fid" & i).Value = DBNull.Value
+                                        Else
+                                            If setODBCParameter(qdbTypes(i), dr.GetValue(upCnfg.sourceFieldOrdinals(i)), CStr(i), destinationCommand, conversionErrors) Then
+                                                Throw New System.Exception("Could not convert the source field '" & dr.GetName(upCnfg.sourceFieldOrdinals(i)) & "' whose value is '" & dr.GetValue(upCnfg.sourceFieldOrdinals(i)) & "' to the data type of " & OdbcTypeToString(qdbTypes(i)) & " of destination field " & upCnfg.destinationFields(i))
+                                            End If
                                         End If
+                                    Next
+                                    If fileLineCounter Mod 1000 = 0 And Not automode Then
+                                        Volatile.Write(progressMessage, "Queuing up record " & fileLineCounter)
                                     End If
-                                Next
-                                If fileLineCounter Mod 1000 = 0 And Not automode Then
-                                    Volatile.Write(progressMessage, "Queuing up record " & fileLineCounter)
-                                End If
-                                fileLineCounter += destinationCommand.ExecuteNonQuery()
-                            End While
-                            If Not automode Then
-                                Volatile.Write(progressMessage, "Committing " & fileLineCounter & " records")
-                            End If
-                            transaction.Commit()
-                            If Not automode Then
-                                Volatile.Write(progressMessage, "Committed " & fileLineCounter & " records")
-                            End If
-                            Alert(fileLineCounter & " rows were uploaded to " & destinationConnection.DataSource & ".")
-                        Catch excpt As Exception
-                            srcCmd.Cancel()
-                            srcCmd.Dispose()
-                            transaction.Rollback()
-                            srcConnection.Close()
-                            Throw New System.Exception("Could not get record " & fileLineCounter & " from " & upCnfg.sourceConnectionString & vbCrLf & excpt.Message)
-                        End Try
-                    End Using
+                                    fileLineCounter += destinationCommand.ExecuteNonQuery()
+                                End While
+                                Return True
+                            End Function)
+
+                        If Not automode Then
+                            Volatile.Write(progressMessage, "Committing " & fileLineCounter & " records")
+                        End If
+                        transaction.Commit()
+                        If Not automode Then
+                            Volatile.Write(progressMessage, "Committed " & fileLineCounter & " records")
+                        End If
+                        Alert(fileLineCounter & " rows were uploaded to " & destinationConnection.DataSource & ".")
+                    Catch excpt As Exception
+                        transaction.Rollback()
+                        Throw New System.Exception("Could not get record " & fileLineCounter & " from " & upCnfg.sourceConnectionString & vbCrLf & excpt.Message)
+                    End Try
                 End Using
             Catch e As Exception
                 Alert("Could not copy because " & e.Message)
@@ -883,6 +1069,48 @@ Public Class frmETL
     Function listDestinationFields(tableName As String) As Dictionary(Of String, String)
         listDestinationFields = New Dictionary(Of String, String)
         Try
+            If isSqlServerConnection(txtDestinationConnectionString.Text) Then
+                Dim sqlConnectionString As String = ""
+                If Not tryBuildSqlServerConnectionString(txtDestinationConnectionString.Text, sqlConnectionString) Then Exit Function
+
+                Dim schemaName As String = ""
+                Dim shortTableName As String = ""
+                splitQualifiedTableName(tableName, schemaName, shortTableName)
+
+                Dim dgComboBoxSql As System.Windows.Forms.DataGridViewComboBoxColumn = DirectCast(dgMapping.Columns(mapping.destination), System.Windows.Forms.DataGridViewComboBoxColumn)
+                dgComboBoxSql.Items.Clear()
+                destinationFIDToFieldName.Clear()
+                destinationFieldNameToFID.Clear()
+                dgComboBoxSql.Items.Add("")
+
+                Using sqlConnection As New SqlConnection(sqlConnectionString)
+                    sqlConnection.Open()
+                    Dim sql As String = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @tableName"
+                    If schemaName.Length > 0 Then
+                        sql &= " AND TABLE_SCHEMA = @schemaName"
+                    End If
+                    sql &= " ORDER BY ORDINAL_POSITION"
+
+                    Using command As New SqlCommand(sql, sqlConnection)
+                        command.Parameters.AddWithValue("@tableName", shortTableName)
+                        If schemaName.Length > 0 Then
+                            command.Parameters.AddWithValue("@schemaName", schemaName)
+                        End If
+
+                        Using reader As SqlDataReader = command.ExecuteReader()
+                            While reader.Read()
+                                Dim columnName As String = reader.GetString(0)
+                                Dim dataType As String = reader.GetString(1)
+                                dgComboBoxSql.Items.Add(columnName)
+                                listDestinationFields.Add(columnName, dataType)
+                            End While
+                        End Using
+                    End Using
+                End Using
+
+                Exit Function
+            End If
+
             Dim connection As OdbcConnection = getODBCConnection(txtDestinationConnectionString.Text)
             If connection Is Nothing Then Exit Function
             Dim restrictions(2) As String
@@ -1058,10 +1286,10 @@ Public Class frmETL
             End If
             strKeyNames = key.GetValueNames() 'Get an array of the key names
             intKeyCount = key.ValueCount() 'Get the number of keys
-                For intCount = 0 To intKeyCount - 1
-                    cmbSourceDSN.Items.Add(strKeyNames(intCount))
-                    cmbDestinationDSN.Items.Add(strKeyNames(intCount))
-                Next
+            For intCount = 0 To intKeyCount - 1
+                cmbSourceDSN.Items.Add(strKeyNames(intCount))
+                cmbDestinationDSN.Items.Add(strKeyNames(intCount))
+            Next
         Catch ex As Exception
             Alert("Could not access system DSNs. " & vbCrLf & ex.Message)
         End Try

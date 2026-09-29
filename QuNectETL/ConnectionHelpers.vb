@@ -148,6 +148,31 @@ Module ConnectionHelpers
         Return quoteIdentifier(connectionString, tableName)
     End Function
 
+    Public Sub splitQualifiedTableName(fullTableName As String, ByRef schemaName As String, ByRef tableName As String)
+        schemaName = ""
+        tableName = fullTableName
+
+        If String.IsNullOrWhiteSpace(fullTableName) Then
+            tableName = ""
+            Exit Sub
+        End If
+
+        Dim dotIndex As Integer = fullTableName.IndexOf("."c)
+        If dotIndex <= 0 OrElse dotIndex >= fullTableName.Length - 1 Then
+            Exit Sub
+        End If
+
+        schemaName = fullTableName.Substring(0, dotIndex)
+        tableName = fullTableName.Substring(dotIndex + 1)
+    End Sub
+
+    Public Function quoteTableName(connectionString As String, fullTableName As String) As String
+        Dim schemaName As String = ""
+        Dim tableName As String = ""
+        splitQualifiedTableName(fullTableName, schemaName, tableName)
+        Return buildQualifiedTableName(connectionString, schemaName, tableName)
+    End Function
+
     Private Function createTableChooserTable() As DataTable
         Dim tables As New DataTable()
         tables.Columns.Add(TableChooserGroupName, GetType(String))
