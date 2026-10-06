@@ -200,20 +200,25 @@ Public Class frmETL
         cmdLineArgs = System.Environment.GetCommandLineArgs()
         If cmdLineArgs.Length > arg.configFile Then
             automode = True
+            Dim jobSucceeded As Boolean = False
 
             Try
-                loadConfigFromFile(cmdLineArgs(arg.configFile))
                 If cmdLineArgs.Length > arg.logFile Then
-                    'open log file
                     logFile = New StreamWriter(File.Open(cmdLineArgs(arg.logFile), FileMode.Append))
                     logFile.WriteLine()
                     logFile.WriteLine(DateTime.Now)
                     logFile.WriteLine("Running Job File: " & cmdLineArgs(arg.configFile))
+                    logFile.Flush()
+                End If
+
+                loadConfigFromFile(cmdLineArgs(arg.configFile))
+                If cmdLineArgs.Length > arg.logFile Then
                     If cnfg.logSQL Then
                         logFile.Write(cnfg.toString())
                     Else
                         logFile.Write(cnfg.toStringNoSQL())
                     End If
+                    logFile.Flush()
                 End If
                 txtSQL.Text = cnfg.sourceSQL
                 Dim cnctStrings As connectionStrings
@@ -221,16 +226,24 @@ Public Class frmETL
                 cnctStrings.dst = txtDestinationConnectionString.Text
                 Dim fieldNodes As New ArrayList
 
-                executeUpload(cnfg)
-                If cmdLineArgs.Length > arg.logFile Then
-                    logFile.WriteLine(DateTime.Now)
-                    logFile.WriteLine("Finished Job")
-                    logFile.Flush()
-                    logFile.Close()
+                If Not executeUpload(cnfg) Then
+                    Throw New Exception("Job failed.")
                 End If
+                jobSucceeded = True
             Catch excpt As Exception
                 Alert(excpt.Message)
             Finally
+                If cmdLineArgs.Length > arg.logFile AndAlso logFile IsNot Nothing Then
+                    logFile.WriteLine(DateTime.Now)
+                    If jobSucceeded Then
+                        logFile.WriteLine("Finished Job")
+                    Else
+                        logFile.WriteLine("Job failed")
+                    End If
+                    logFile.Flush()
+                    logFile.Close()
+                End If
+                Environment.ExitCode = If(jobSucceeded, 0, 1)
                 Me.Close()
             End Try
             Exit Sub
@@ -864,8 +877,10 @@ Public Class frmETL
         Catch ex As Exception
             If Not automode Then
                 Volatile.Write(progressMessage, "")
+                Alert("Could not copy because " & ex.Message)
+            Else
+                Throw New Exception("Could not copy because " & ex.Message, ex)
             End If
-            Alert("Could not copy because " & ex.Message)
         End Try
         If Not automode Then
             Volatile.Write(progressMessage, "")
@@ -944,6 +959,9 @@ Public Class frmETL
                     End Try
                 End Using
             Catch e As Exception
+                If automode Then
+                    Throw New Exception("Could not copy because " & e.Message, e)
+                End If
                 Alert("Could not copy because " & e.Message)
             Finally
 
@@ -951,8 +969,10 @@ Public Class frmETL
         Catch ex As Exception
             If Not automode Then
                 Volatile.Write(progressMessage, "")
+                Alert("Could not copy because " & ex.Message)
+            Else
+                Throw New Exception("Could not copy because " & ex.Message, ex)
             End If
-            Alert("Could not copy because " & ex.Message)
         End Try
         If Not automode Then
             Volatile.Write(progressMessage, "")
