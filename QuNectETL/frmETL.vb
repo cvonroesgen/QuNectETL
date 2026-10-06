@@ -327,7 +327,12 @@ Public Class frmETL
                     End If
                     Dim destComboBoxCell As DataGridViewComboBoxCell = dgMapping.Rows(srcOrdinal).Cells(mapping.destination)
 
-                    destComboBoxCell.Value = cnfg.destinationFields(i)
+                    Dim destinationFieldName As String = cnfg.destinationFields(i).ToString()
+                    If Not destinationFieldNameToType.ContainsKey(destinationFieldName) AndAlso destinationFIDToFieldName.ContainsKey(destinationFieldName) Then
+                        destinationFieldName = destinationFIDToFieldName(destinationFieldName)
+                    End If
+
+                    destComboBoxCell.Value = destinationFieldName
                 End If
             Next
         End If
